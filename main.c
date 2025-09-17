@@ -3,9 +3,12 @@
 void addData()
 {
     char fullname[30];
-    scanf("%s", fullname);
-    
+    int age;
+    char healthStatus[50];
 
+    printf("Enter Data: ");
+    scanf("%29s, %d, %40s", fullname, &age, healthStatus);
+  
 }
 
 void searchData()
@@ -25,15 +28,15 @@ void deleteData()
 
 void exitMenu()
 {
-    printf("Thank you for using the program.\n");
+    printf("Thank you for using the program system.\n");
 }
 
 void displayMenu()
 {
     char alphabet;
-    scanf("%c", &alphabet);
-    printf("Menu Diaplay\n a.Add Data\n b.Search Data\n c.Update Data\n d.Delete data\n e.Exit Menu\n ");
-    printf("Please Enter an alphabet[a-e] to display a menu : %c");
+    printf("Welcome to Annual Head Check up Management System!\n Menu Display\n a.Add Data\n b.Search Data\n c.Update Data\n d.Delete data\n e.Exit Menu\n");
+    printf("Please Enter an alphabet[a-e] to display a menu: ");
+    scanf(" %c", &alphabet); 
 
     switch (alphabet)
     {
@@ -71,11 +74,11 @@ int main(){
         return 1;
     }
 
-    char line[100];
-    while (fgets(line, sizeof(line), data) != NULL)
-    {
-        printf("อ่านบรรทัด: %s", line); // แสดงผลบรรทัดที่อ่านได้
-    }
+    // char line[100];
+    // while (fgets(line, sizeof(line), data) != NULL)
+    // {
+    //     printf("อ่านบรรทัด: %s", line); // แสดงผลบรรทัดที่อ่านได้
+    // }
 
     fclose(data);
 
