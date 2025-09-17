@@ -1,0 +1,15 @@
+﻿PatientName,Age,HealthStatus,CheckupDate
+John Doe,30,Healthy,8/1/2025
+Jane Smith,45, Requires Follow-Up,9/3/2025
+Alice Mccaulley,23,Unhealthy,12/3/2025
+Daphnie Rohas,38,Healthy,15/3/2025
+Roger Hisston,65, Requires Follow-Up,18/3/2025
+Christina Rossen,17, Requires Follow-Up,19/3/2025
+Gerard Bolt,21,Healthy,21/3/2025
+Cooper Clay,22,Unhealthy,25/3/2025
+Bronwyn Levine,28,Healthy,26/3/2025
+Ashley Cromwell,34,Unhealthy,27/3/2025
+Nate Murphy,42, Requires Follow-Up,27/3/2025
+Matthew Velez,68,Healthy,29/3/2025
+Mayda Kingsley,24,Unhealthy,30/3/2025
+Kelly Clakson,39,Unhealthy,31/3/2025
