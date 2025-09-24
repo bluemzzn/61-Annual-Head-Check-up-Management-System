@@ -66,8 +66,9 @@ void displayMenu()
 
 int main(){
     // displayMenu();
-
-    FILE *data = fopen("test.csv", "r");
+    
+  
+    FILE *data = fopen("Checkup-Data.csv","r");
 
     // check file opened
     if (data == NULL)
@@ -78,11 +79,11 @@ int main(){
         return 1;
     }
 
-     char line[100];
-     while (fgets(line, sizeof(line), data) != NULL)
-     {
-         printf("อ่านบรรทัด: %s", line); // แสดงผลบรรทัดที่อ่านได้
-     }
+    char row[100];
+
+    while (fgets(row, sizeof(row), data) ){
+        printf("%s", row);
+    }
 
     fclose(data);
 
