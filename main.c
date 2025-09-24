@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 void addData()
 {
@@ -6,9 +7,12 @@ void addData()
     int age;
     char healthStatus[50];
 
+    FILE *data = fopen("test.csv", "a");
+
     printf("Enter Data: ");
-    scanf("%29s, %d, %40s", fullname, &age, healthStatus);
-  
+    fprintf(data, "%29s, %d, %40s", fullname, &age, healthStatus);
+    
+
 }
 
 void searchData()
@@ -61,9 +65,9 @@ void displayMenu()
 }
 
 int main(){
-    displayMenu();
+    // displayMenu();
 
-    FILE *data = fopen("Checkup-Data.csv", "r");
+    FILE *data = fopen("test.csv", "r");
 
     // check file opened
     if (data == NULL)
@@ -74,11 +78,11 @@ int main(){
         return 1;
     }
 
-    // char line[100];
-    // while (fgets(line, sizeof(line), data) != NULL)
-    // {
-    //     printf("อ่านบรรทัด: %s", line); // แสดงผลบรรทัดที่อ่านได้
-    // }
+     char line[100];
+     while (fgets(line, sizeof(line), data) != NULL)
+     {
+         printf("อ่านบรรทัด: %s", line); // แสดงผลบรรทัดที่อ่านได้
+     }
 
     fclose(data);
 
