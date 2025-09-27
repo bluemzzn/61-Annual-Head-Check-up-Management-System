@@ -1,18 +1,74 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+#define csv "Checkup-Data.csv"
+
+typedef struct 
+{
+    char firstname[30];
+    char lastname[30];
+    int age;
+    char healthStatus[50];
+    char checkupDate[11]; // format YYYY-MM-DD + \0
+
+} Patient;
+
 
 void addData()
 {
-    char fullname[30];
-    int age;
-    char healthStatus[50];
 
-    FILE *data = fopen("test.csv", "a");
+    Patient newPatient;
 
-    printf("Enter Data: ");
-    fprintf(data, "%29s, %d, %40s", fullname, &age, healthStatus);
-    
+    printf("Enter Firstname: ");
+    scanf("%29s", newPatient.firstname);
 
+    printf("Enter Lastname: ");
+    scanf("%29s", newPatient.lastname);
+
+    printf("Enter Age: ");
+    scanf("%d", &newPatient.age);
+
+    printf("Enter Health Status: ");
+    scanf(" %49[^\n]", newPatient.healthStatus);
+
+    printf("Enter Checkup Date (YYYY-MM-DD): ");
+    scanf("%10s", newPatient.checkupDate);
+
+    FILE *data = fopen(csv, "a");
+
+    if(data == NULL){
+        printf("Error opening file.");
+        return;
+    }
+
+    fprintf(data, "%s %s,%d,%s,%s",
+            newPatient.firstname, newPatient.lastname, newPatient.age, newPatient.healthStatus, newPatient.checkupDate);
+
+    fclose(data);
+
+}
+
+void displayallData()
+{
+
+    char row[100];
+
+    FILE *data = fopen(csv, "r");
+
+    if (data == NULL)
+    {
+        printf("Cannot open the file for reading.\n");
+        return;
+    }
+
+    while (fgets(row, sizeof(row), data))
+    {
+        printf("%s", row);
+    }
+
+    fclose(data);
 }
 
 void searchData()
@@ -22,12 +78,10 @@ void searchData()
 
 void updateData()
 {
-
 }
 
 void deleteData()
 {
-
 }
 
 void exitMenu()
@@ -38,25 +92,36 @@ void exitMenu()
 void displayMenu()
 {
     char alphabet;
-    printf("Welcome to Annual Head Check up Management System!\n Menu Display\n a.Add Data\n b.Search Data\n c.Update Data\n d.Delete data\n e.Exit Menu\n");
-    printf("Please Enter an alphabet[a-e] to display a menu: ");
-    scanf(" %c", &alphabet); 
+    printf("----- Welcome to Annual Head Check up Management System! -----\n \n a.Display all data\n b.Add Data\n c.Search Data\n d.Update Data\n e.Delete data\n f.Unit test\n g.End to end test\n h.Exit Menu\n");
+    printf("\nPlease Enter an alphabet[a-e] to display a menu: ");
+    scanf(" %c", &alphabet);
 
     switch (alphabet)
     {
     case 'a':
-        addData();
+        displayallData();
         break;
     case 'b':
-        searchData();
+        addData();
         break;
     case 'c':
+        searchData();
+        break;
+    case 'd':
         updateData();
         break;
 
-    case 'd':
+    case 'e':
         deleteData();
         break;
+
+        // case 'f':
+        //     deleteData();
+        //     break;
+
+        // case 'g':
+        //     deleteData();
+        //     break;
 
     default:
         exitMenu();
@@ -64,28 +129,9 @@ void displayMenu()
     }
 }
 
-int main(){
-    // displayMenu();
-    
-  
-    FILE *data = fopen("Checkup-Data.csv","r");
-
-    // check file opened
-    if (data == NULL)
-    {
-        printf("File: %p\n", data);
-        printf("cannot open the file");
-
-        return 1;
-    }
-
-    char row[100];
-
-    while (fgets(row, sizeof(row), data) ){
-        printf("%s", row);
-    }
-
-    fclose(data);
+int main()
+{
+    displayMenu();
 
     return 0;
 }
