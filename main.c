@@ -14,6 +14,40 @@ typedef struct
 
 } Patient;
 
+int validatetheDate(const char *date)
+{
+
+    if (strlen(date) != 10)
+    {
+        printf("Please input the correct format.\n");
+        return 0;
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        if (i == 4 || i == 7)
+        {
+            if (date[i] != '-')
+                return 0;
+        }
+        else
+        {
+            if (date[i] < '0' || date[i] > '9')
+                return 0;
+        }
+    }
+
+    int day, month, year;
+    sscanf(date, " %4d-%2d-%2d", &year, &month, &day);
+
+    if (month < 1 || month > 12)
+        return 0;
+    if (day < 1 || day > 31)
+        return 0;
+
+    return 1;
+}
+
 void addData()
 {
 
@@ -31,14 +65,19 @@ void addData()
     printf("Enter Health Status: ");
     scanf(" %49[^\n]", newPatient.healthStatus);
 
-    printf("Enter Checkup Date (YYYY-MM-DD): ");
-    scanf("%10s", newPatient.checkupDate);
+
+    do{
+        printf("Enter Checkup Date (YYYY-MM-DD): ");
+        scanf("%10s", newPatient.checkupDate);
+
+    }while (!validatetheDate(newPatient.checkupDate));
+    
 
     FILE *data = fopen(csv, "a");
 
     if (data == NULL)
     {
-        printf("Error opening file.");
+        perror("Error opening file.");
         return;
     }
 
@@ -142,6 +181,7 @@ void updateData()
         return;
     }
 
+    // search name to update => age, healthStatus and checkupDate
     printf("Enter First Name to update: ");
     scanf("%29s", firstname);
     printf("Enter Last Name to update: ");
@@ -306,20 +346,20 @@ int main()
         if (running)
         {
             char continues;
-            printf("\nDo you want to continue program? (y/n): \n");
+            printf("\nDo you want to continue program? (y/n): ");
             scanf(" %c", &continues);
 
             if (continues == 'n' || continues == 'N')
             {
                 running = 0;
                 exitMenu();
-
             }
-            else if(continues == 'y' || continues == 'Y'){
+            else if (continues == 'y' || continues == 'Y')
+            {
                 running = 1;
             }
         }
     }
-    
+
     return 0;
 }
