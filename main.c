@@ -81,7 +81,7 @@ void toLowerCase(char *str)
     {
         if (*str >= 'A' && *str <= 'Z')
         {
-            *str = -'A' + 'a';
+            *str = *str - 'A' + 'a';
         }
     }
 }
@@ -98,16 +98,33 @@ void searchData()
 
     toLowerCase(keyword);
 
-    FILE *data = fopen("Checkup-", "r");
+    FILE *data = fopen(csv, "r");
 
     if (data == NULL)
     {
-        printf("Cannot open the file.");
+        perror("Cannot open the file.");
+        return;
     }
 
+    while (fgets(row, sizeof(row), data))
+    {
+        char rowLower[200];
+        strcpy(rowLower, row);
+        toLowerCase(rowLower);
+
+        if (strstr(rowLower, keyword) != NULL)
+        {
+            printf("%s", row);
+            found = 1;
+        }
+    }
+
+    if (!found)
+    {
+        printf("No matching records found.\n");
+    }
 
     fclose(data);
-
 }
 
 void updateData()
@@ -115,6 +132,14 @@ void updateData()
 }
 
 void deleteData()
+{
+}
+
+void unitTest()
+{
+}
+
+void endtoendTest()
 {
 }
 
@@ -126,7 +151,7 @@ void exitMenu()
 void displayMenu()
 {
     char alphabet;
-    printf("----- Welcome to Annual Head Check up Management System! -----\n \n a.Display all data\n b.Add Data\n c.Search Data\n d.Update Data\n e.Delete data\n f.Unit test\n g.End to end test\n h.Exit Menu\n");
+    printf("----- Welcome to Annual Head Check up Management System! -----\n \n a. Display all data\n b. Add Data\n c. Search Data\n d. Update Data\n e. Delete data\n f. Unit test\n g. End to end test\n h. Exit Menu\n");
     printf("\nPlease Enter an alphabet[a-e] to display a menu: ");
     scanf(" %c", &alphabet);
 
@@ -149,16 +174,20 @@ void displayMenu()
         deleteData();
         break;
 
-        // case 'f':
-        //     deleteData();
-        //     break;
+    case 'f':
+        unitTest();
+        break;
 
-        // case 'g':
-        //     deleteData();
-        //     break;
+    case 'g':
+        endtoendTest();
+        break;
+
+    case 'h':
+        exitMenu();
+        break;
 
     default:
-        exitMenu();
+        printf("Please input a valid alphabet (a-h).\n");
         break;
     }
 }
