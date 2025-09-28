@@ -133,6 +133,46 @@ void updateData()
 
 void deleteData()
 {
+    char firstname[30], lastname[30];
+    char row[200];
+    int found = 0;
+
+    FILE *data = fopen(csv, "r");
+    FILE *temp = fopen("temp.csv", "w");
+
+    if (data == NULL || temp == NULL) {
+        printf("Error opening files.\n");
+    }
+
+    printf("Enter First Name to update: ");
+    scanf("%29s", firstname);
+    printf("Enter Last Name to update: ");
+    scanf("%29s", lastname);
+
+    char searchName[50];
+    sprintf(searchName, "%s %s", firstname, lastname);
+
+   
+    while (fgets(row, sizeof(row), data)) {
+ 
+        if (strncmp(row, searchName, strlen(searchName)) == 0) {
+            found = 1;
+            continue; 
+        }
+        fprintf(temp, "%s", row);
+    }
+
+    fclose(data);
+    fclose(temp);
+
+    if (found) {
+        remove(csv);
+        rename("temp.csv", csv);
+        printf("Record deleted successfully.\n");
+    } else {
+        remove("temp.csv");
+        printf("Record not found.\n");
+    }
 }
 
 void unitTest()
