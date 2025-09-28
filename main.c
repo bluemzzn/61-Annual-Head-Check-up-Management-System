@@ -5,7 +5,7 @@
 
 #define csv "Checkup-Data.csv"
 
-typedef struct 
+typedef struct
 {
     char firstname[30];
     char lastname[30];
@@ -14,7 +14,6 @@ typedef struct
     char checkupDate[11]; // format YYYY-MM-DD + \0
 
 } Patient;
-
 
 void addData()
 {
@@ -38,16 +37,20 @@ void addData()
 
     FILE *data = fopen(csv, "a");
 
-    if(data == NULL){
+    if (data == NULL)
+    {
         printf("Error opening file.");
         return;
     }
 
     fprintf(data, "%s %s,%d,%s,%s",
-            newPatient.firstname, newPatient.lastname, newPatient.age, newPatient.healthStatus, newPatient.checkupDate);
+            newPatient.firstname,
+            newPatient.lastname,
+            newPatient.age,
+            newPatient.healthStatus,
+            newPatient.checkupDate);
 
     fclose(data);
-
 }
 
 void displayallData()
@@ -71,9 +74,40 @@ void displayallData()
     fclose(data);
 }
 
+void toLowerCase(char *str)
+{
+    // make string to lowercase
+    for (; *str; str++)
+    {
+        if (*str >= 'A' && *str <= 'Z')
+        {
+            *str = -'A' + 'a';
+        }
+    }
+}
+
 void searchData()
 {
-    // from name and health status
+    // search from name and health status
+    char keyword[50];
+    char row[200];
+    int found = 0;
+
+    printf("Enter the name or health status: ");
+    scanf(" %[^\n]", keyword);
+
+    toLowerCase(keyword);
+
+    FILE *data = fopen("Checkup-", "r");
+
+    if (data == NULL)
+    {
+        printf("Cannot open the file.");
+    }
+
+
+    fclose(data);
+
 }
 
 void updateData()
