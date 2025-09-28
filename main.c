@@ -129,6 +129,60 @@ void searchData()
 
 void updateData()
 {
+    char firstname[30], lastname[30];
+    char row[200];
+    int found = 0;
+    Patient updatedPatient;
+
+    FILE *data = fopen(csv, "r");
+    FILE *temp = fopen("temp.csv", "w");
+
+    if (data == NULL || temp == NULL) {
+        printf("Error opening files.\n");
+        return;
+    }
+
+    printf("Enter First Name to update: ");
+    scanf("%29s", firstname);
+    printf("Enter Last Name to update: ");
+    scanf("%29s", lastname);
+
+    char searchName[50];
+    sprintf(searchName, "%s %s", firstname, lastname);
+
+    while (fgets(row, sizeof(row), data)) {
+        if (strncmp(row, searchName, strlen(searchName)) == 0) {
+            printf("Enter new age: ");
+            scanf("%d", &updatedPatient.age);
+            
+            printf("Enter new health status: ");
+            scanf(" %49[^\n]", updatedPatient.healthStatus);
+            
+            printf("Enter new checkup date (YYYY-MM-DD): ");
+            scanf("%10s", updatedPatient.checkupDate);
+
+            fprintf(temp, "%s %s,%d,%s,%s\n", 
+                firstname, lastname,
+                updatedPatient.age,
+                updatedPatient.healthStatus,
+                updatedPatient.checkupDate);
+            found = 1;
+        } else {
+            fprintf(temp, "%s", row);
+        }
+    }
+
+    fclose(data);
+    fclose(temp);
+
+    if (found) {
+        remove(csv);
+        rename("temp.csv", csv);
+        printf("Record updated successfully.\n");
+    } else {
+        remove("temp.csv");
+        printf("Record not found.\n");
+    }
 }
 
 void deleteData()
