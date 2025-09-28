@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #define csv "Checkup-Data.csv"
 
@@ -43,7 +42,7 @@ void addData()
         return;
     }
 
-    fprintf(data, "%s %s,%d,%s,%s",
+    fprintf(data, "%s %s,%d,%s,%s\n",
             newPatient.firstname,
             newPatient.lastname,
             newPatient.age,
@@ -137,7 +136,8 @@ void updateData()
     FILE *data = fopen(csv, "r");
     FILE *temp = fopen("temp.csv", "w");
 
-    if (data == NULL || temp == NULL) {
+    if (data == NULL || temp == NULL)
+    {
         printf("Error opening files.\n");
         return;
     }
@@ -150,24 +150,28 @@ void updateData()
     char searchName[50];
     sprintf(searchName, "%s %s", firstname, lastname);
 
-    while (fgets(row, sizeof(row), data)) {
-        if (strncmp(row, searchName, strlen(searchName)) == 0) {
+    while (fgets(row, sizeof(row), data))
+    {
+        if (strncmp(row, searchName, strlen(searchName)) == 0)
+        {
             printf("Enter new age: ");
             scanf("%d", &updatedPatient.age);
-            
+
             printf("Enter new health status: ");
             scanf(" %49[^\n]", updatedPatient.healthStatus);
-            
+
             printf("Enter new checkup date (YYYY-MM-DD): ");
             scanf("%10s", updatedPatient.checkupDate);
 
-            fprintf(temp, "%s %s,%d,%s,%s\n", 
-                firstname, lastname,
-                updatedPatient.age,
-                updatedPatient.healthStatus,
-                updatedPatient.checkupDate);
+            fprintf(temp, "%s %s,%d,%s,%s\n",
+                    firstname, lastname,
+                    updatedPatient.age,
+                    updatedPatient.healthStatus,
+                    updatedPatient.checkupDate);
             found = 1;
-        } else {
+        }
+        else
+        {
             fprintf(temp, "%s", row);
         }
     }
@@ -175,11 +179,14 @@ void updateData()
     fclose(data);
     fclose(temp);
 
-    if (found) {
+    if (found)
+    {
         remove(csv);
         rename("temp.csv", csv);
         printf("Record updated successfully.\n");
-    } else {
+    }
+    else
+    {
         remove("temp.csv");
         printf("Record not found.\n");
     }
@@ -194,7 +201,8 @@ void deleteData()
     FILE *data = fopen(csv, "r");
     FILE *temp = fopen("temp.csv", "w");
 
-    if (data == NULL || temp == NULL) {
+    if (data == NULL || temp == NULL)
+    {
         printf("Error opening files.\n");
     }
 
@@ -206,12 +214,13 @@ void deleteData()
     char searchName[50];
     sprintf(searchName, "%s %s", firstname, lastname);
 
-   
-    while (fgets(row, sizeof(row), data)) {
- 
-        if (strncmp(row, searchName, strlen(searchName)) == 0) {
+    while (fgets(row, sizeof(row), data))
+    {
+
+        if (strncmp(row, searchName, strlen(searchName)) == 0)
+        {
             found = 1;
-            continue; 
+            continue;
         }
         fprintf(temp, "%s", row);
     }
@@ -219,11 +228,14 @@ void deleteData()
     fclose(data);
     fclose(temp);
 
-    if (found) {
+    if (found)
+    {
         remove(csv);
         rename("temp.csv", csv);
         printf("Record deleted successfully.\n");
-    } else {
+    }
+    else
+    {
         remove("temp.csv");
         printf("Record not found.\n");
     }
@@ -242,53 +254,72 @@ void exitMenu()
     printf("Thank you for using the program system.\n");
 }
 
-void displayMenu()
-{
-    char alphabet;
-    printf("----- Welcome to Annual Head Check up Management System! -----\n \n a. Display all data\n b. Add Data\n c. Search Data\n d. Update Data\n e. Delete data\n f. Unit test\n g. End to end test\n h. Exit Menu\n");
-    printf("\nPlease Enter an alphabet[a-e] to display a menu: ");
-    scanf(" %c", &alphabet);
-
-    switch (alphabet)
-    {
-    case 'a':
-        displayallData();
-        break;
-    case 'b':
-        addData();
-        break;
-    case 'c':
-        searchData();
-        break;
-    case 'd':
-        updateData();
-        break;
-
-    case 'e':
-        deleteData();
-        break;
-
-    case 'f':
-        unitTest();
-        break;
-
-    case 'g':
-        endtoendTest();
-        break;
-
-    case 'h':
-        exitMenu();
-        break;
-
-    default:
-        printf("Please input a valid alphabet (a-h).\n");
-        break;
-    }
-}
-
 int main()
 {
-    displayMenu();
 
+    char alphabet;
+    int running = 1;
+
+    while (running)
+    {
+
+        printf("----- Welcome to Annual Head Check up Management System! -----\n \n a. Display all data\n b. Add Data\n c. Search Data\n d. Update Data\n e. Delete data\n f. Unit test\n g. End to end test\n h. Exit Menu\n");
+        printf("\nPlease Enter an alphabet[a-h] to display a menu: ");
+        scanf(" %c", &alphabet);
+
+        switch (alphabet)
+        {
+        case 'a':
+            displayallData();
+            break;
+        case 'b':
+            addData();
+            break;
+        case 'c':
+            searchData();
+            break;
+        case 'd':
+            updateData();
+            break;
+
+        case 'e':
+            deleteData();
+            break;
+
+        case 'f':
+            unitTest();
+            break;
+
+        case 'g':
+            endtoendTest();
+            break;
+
+        case 'h':
+            exitMenu();
+            break;
+
+        default:
+            printf("Please input a valid alphabet (a-h).\n");
+            break;
+        }
+
+        if (running)
+        {
+            char continues;
+            printf("\nDo you want to continue program? (y/n): \n");
+            scanf(" %c", &continues);
+
+            if (continues == 'n' || continues == 'N')
+            {
+                running = 0;
+                exitMenu();
+
+            }
+            else if(continues == 'y' || continues == 'Y'){
+                running = 1;
+            }
+        }
+    }
+    
     return 0;
 }
