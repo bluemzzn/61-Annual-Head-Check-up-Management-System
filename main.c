@@ -65,13 +65,12 @@ void addData()
     printf("Enter Health Status: ");
     scanf(" %49[^\n]", newPatient.healthStatus);
 
-
-    do{
+    do
+    {
         printf("Enter Checkup Date (YYYY-MM-DD): ");
         scanf("%10s", newPatient.checkupDate);
 
-    }while (!validatetheDate(newPatient.checkupDate));
-    
+    } while (!validatetheDate(newPatient.checkupDate));
 
     FILE *data = fopen(csv, "a");
 
@@ -200,8 +199,12 @@ void updateData()
             printf("Enter new health status: ");
             scanf(" %49[^\n]", updatedPatient.healthStatus);
 
-            printf("Enter new checkup date (YYYY-MM-DD): ");
-            scanf("%10s", updatedPatient.checkupDate);
+            do
+            {
+                printf("Enter Checkup Date (YYYY-MM-DD): ");
+                scanf("%10s", updatedPatient.checkupDate);
+
+            } while (!validatetheDate(updatedPatient.checkupDate));
 
             fprintf(temp, "%s %s,%d,%s,%s\n",
                     firstname, lastname,
@@ -246,9 +249,9 @@ void deleteData()
         printf("Error opening files.\n");
     }
 
-    printf("Enter First Name to update: ");
+    printf("Enter First Name to delete: ");
     scanf("%29s", firstname);
-    printf("Enter Last Name to update: ");
+    printf("Enter Last Name to delete: ");
     scanf("%29s", lastname);
 
     char searchName[50];
