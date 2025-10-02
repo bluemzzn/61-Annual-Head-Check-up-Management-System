@@ -4,6 +4,9 @@
 
 #define csv "Checkup-Data.csv"
 
+
+// ใส่วิธีcompile + run program
+
 typedef struct
 {
     char firstname[30];
@@ -348,20 +351,39 @@ int main()
 
         if (running)
         {
-            char continues;
+            char continuesMenu;
             printf("\nDo you want to continue program? (y/n): ");
-            scanf(" %c", &continues);
+            scanf(" %c", &continuesMenu);
 
-            if (continues == 'n' || continues == 'N')
+            if (continuesMenu == 'n' || continuesMenu == 'N')
             {
                 running = 0;
                 exitMenu();
             }
-            else if (continues == 'y' || continues == 'Y')
+            else if (continuesMenu == 'y' || continuesMenu == 'Y')
             {
                 running = 1;
             }
-        }
+            else
+            {
+                do {
+                    printf("Please enter a correct alphabet (only y/n): ");
+                    scanf(" %c", &continuesMenu);
+                    
+                    if (continuesMenu == 'n' || continuesMenu == 'N')
+                    {
+                        running = 0;
+                        exitMenu();
+                        break;
+                    }
+                    else if (continuesMenu == 'y' || continuesMenu == 'Y')
+                    {
+                        running = 1;
+                        break;
+                    }
+                } while (1);
+            }
+         }
     }
 
     return 0;
