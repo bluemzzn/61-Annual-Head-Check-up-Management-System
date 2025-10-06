@@ -99,6 +99,7 @@ int validateNum(const char *number_notchar)
     }
     return 1;
 }
+
 void addData()
 {
 
@@ -247,10 +248,9 @@ void searchData()
 
     fclose(data);
 }
-
 void updateData()
 {
-    char firstname[30], lastname[30];
+    char firstname[30], middlename[30], lastname[30];
     char row[1000];
     int found = 0;
     Patient updatedPatient;
@@ -264,44 +264,79 @@ void updateData()
         return;
     }
 
-    // search name to update => age, healthStatus and checkupDate
+    char oldFirstname[30], oldLastname[30];
     printf("Enter First Name to update: ");
-    scanf("%29s", firstname);
+    scanf("%29s", oldFirstname);
     printf("Enter Last Name to update: ");
-    scanf("%29s", lastname);
+    scanf("%29s", oldLastname);
 
-    char searchName[50];
-    sprintf(searchName, "%s %s", firstname, lastname);
+    char searchName[60];
+    sprintf(searchName, "%s,%s", oldFirstname, oldLastname);
 
     while (fgets(row, sizeof(row), data))
     {
-        if (strncmp(row, searchName, strlen(searchName)) == 0)
-        {
-            do
-            {
-                printf("Enter new age: ");
-                scanf("%d", &updatedPatient.age);
-            } while (!validateNum(updatedPatient.age));
+        char tmpRow[1000];
+        strcpy(tmpRow, row);
 
-            do
-            {
-                printf("Enter new health status: ");
+
+        char *token = strtok(tmpRow, ",");
+        char *midToken = strtok(NULL, ","); 
+        char *lastToken = strtok(NULL, ",");
+
+        if (token && lastToken && strcmp(token, oldFirstname) == 0 && strcmp(lastToken, oldLastname) == 0)
+        {
+            found = 1;
+
+            do {
+                printf("Enter new Firstname: ");
+                scanf("%29s", updatedPatient.firstname);
+            } while (!validateChar(updatedPatient.firstname));
+
+            do {
+                printf("Do you want to input Middlename? (y/n): ");
+                char choice;
+                scanf(" %c", &choice);
+                if (choice == 'n' || choice == 'N') {
+                    strcpy(updatedPatient.middlename, "");
+                    break;
+                } else if (choice == 'y' || choice == 'Y') {
+                    do {
+                        printf("Enter Middlename: ");
+                        scanf("%29s", updatedPatient.middlename);
+                    } while (!validateChar(updatedPatient.middlename));
+                    break;
+                }
+            } while (1);
+
+            do {
+                printf("Enter new Lastname: ");
+                scanf("%29s", updatedPatient.lastname);
+            } while (!validateChar(updatedPatient.lastname));
+
+            char ageStr[10];
+            do {
+                printf("Enter new Age: ");
+                scanf("%s", ageStr);
+            } while (!validateNum(ageStr));
+            updatedPatient.age = atoi(ageStr);
+
+            do {
+                printf("Enter new Health Status: ");
                 scanf(" %49[^\n]", updatedPatient.healthStatus);
             } while (!validateChar(updatedPatient.healthStatus));
 
-            do
-            {
+            do {
                 printf("Enter Checkup Date (YYYY-MM-DD): ");
                 scanf("%10s", updatedPatient.checkupDate);
-
             } while (!validatetheDate(updatedPatient.checkupDate));
 
-            fprintf(temp, "%s,%s,%d,%s,%s\n",
-                    firstname, lastname,
+            fprintf(temp, "%s,%s,%s,%d,%s,%s\n",
+                    updatedPatient.firstname,
+                    updatedPatient.middlename,
+                    updatedPatient.lastname,
                     updatedPatient.age,
                     updatedPatient.healthStatus,
                     updatedPatient.checkupDate);
-            found = 1;
         }
         else
         {
