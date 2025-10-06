@@ -315,6 +315,7 @@ void deleteData()
     if (data == NULL || temp == NULL)
     {
         printf("Error opening files.\n");
+        return;
     }
 
     printf("Enter First Name to delete: ");
@@ -322,17 +323,23 @@ void deleteData()
     printf("Enter Last Name to delete: ");
     scanf("%29s", lastname);
 
-    char searchName[50];
-    sprintf(searchName, "%s %s", firstname, lastname);
-
     while (fgets(row, sizeof(row), data))
     {
+        char tmpRow[1000];
+        strcpy(tmpRow, row);
 
-        if (strncmp(row, searchName, strlen(searchName)) == 0)
+
+        char *token = strtok(tmpRow, ",");       
+        char *midToken = strtok(NULL, ",");      
+        char *lastToken = strtok(NULL, ",");    
+
+        if (token && lastToken && strcmp(token, firstname) == 0 && strcmp(lastToken, lastname) == 0)
         {
             found = 1;
-            continue;
+            printf("Record deleted: %s %s %s\n", token, midToken ? midToken : "", lastToken);
+            continue; 
         }
+
         fprintf(temp, "%s", row);
     }
 
@@ -343,7 +350,6 @@ void deleteData()
     {
         remove(csv);
         rename("temp.csv", csv);
-        printf("Record deleted successfully.\n");
     }
     else
     {
