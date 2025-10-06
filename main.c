@@ -4,12 +4,12 @@
 
 #define csv "Checkup-Data.csv"
 
-
 // ใส่วิธีcompile + run program
 
 typedef struct
 {
     char firstname[30];
+    char middlename[30];
     char lastname[30];
     int age;
     char healthStatus[50];
@@ -55,9 +55,26 @@ void addData()
 {
 
     Patient newPatient;
+    char middlename;
 
     printf("Enter Firstname: ");
     scanf("%29s", newPatient.firstname);
+
+    do {
+        printf("\nDo you want to input middlename? (y/n): ");
+        scanf(" %c", &middlename);
+
+        if (middlename == 'n' || middlename == 'N') {
+            strcpy(newPatient.middlename, "");
+            break;
+        }
+        else if (middlename == 'y' || middlename == 'Y') {
+            printf("Enter Middlename: ");
+            scanf("%29s", newPatient.middlename);
+            break;
+        }
+        printf("Please enter a correct alphabet (only y/n)\n");
+    } while (1);
 
     printf("Enter Lastname: ");
     scanf("%29s", newPatient.lastname);
@@ -83,8 +100,9 @@ void addData()
         return;
     }
 
-    fprintf(data, "%s %s,%d,%s,%s\n",
+    fprintf(data, "%s %s %s,%d,%s,%s\n",
             newPatient.firstname,
+            newPatient.middlename,
             newPatient.lastname,
             newPatient.age,
             newPatient.healthStatus,
@@ -96,7 +114,7 @@ void addData()
 void displayallData()
 {
 
-    char row[100];
+    char row[1000];
 
     FILE *data = fopen(csv, "r");
 
@@ -130,10 +148,10 @@ void searchData()
 {
     // search from name and health status
     char keyword[50];
-    char row[200];
+    char row[1000];
     int found = 0;
 
-    printf("Enter the name or health status: ");
+    printf("Search or Enter data you want : ");
     scanf(" %[^\n]", keyword);
 
     toLowerCase(keyword);
@@ -148,7 +166,7 @@ void searchData()
 
     while (fgets(row, sizeof(row), data))
     {
-        char rowLower[200];
+        char rowLower[1000];
         strcpy(rowLower, row);
         toLowerCase(rowLower);
 
@@ -170,7 +188,7 @@ void searchData()
 void updateData()
 {
     char firstname[30], lastname[30];
-    char row[200];
+    char row[1000];
     int found = 0;
     Patient updatedPatient;
 
@@ -241,7 +259,7 @@ void updateData()
 void deleteData()
 {
     char firstname[30], lastname[30];
-    char row[200];
+    char row[1000];
     int found = 0;
 
     FILE *data = fopen(csv, "r");
@@ -366,10 +384,11 @@ int main()
             }
             else
             {
-                do {
+                do
+                {
                     printf("Please enter a correct alphabet (only y/n): ");
                     scanf(" %c", &continuesMenu);
-                    
+
                     if (continuesMenu == 'n' || continuesMenu == 'N')
                     {
                         running = 0;
@@ -383,7 +402,7 @@ int main()
                     }
                 } while (1);
             }
-         }
+        }
     }
 
     return 0;
