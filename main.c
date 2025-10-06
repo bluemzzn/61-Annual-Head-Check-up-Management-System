@@ -51,24 +51,56 @@ int validatetheDate(const char *date)
     return 1;
 }
 
+int validateChar(const char *character_notnum)
+{
+    for (int i = 0; character_notnum[i] != '\0'; i++)
+    {
+        if (!((character_notnum[i] >= 'A' && character_notnum[i] <= 'Z') ||
+              (character_notnum[i] >= 'a' && character_notnum[i] <= 'z')))
+        {
+            printf("Please enter only letters.\n");
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int validateNum(const char *number_notchar)
+{
+    for (int i = 0; number_notchar[i] != '\0'; i++)
+    {
+        if (number_notchar[i] < '0' || number_notchar[i] > '9')
+        {
+            printf("Please enter only numbers.\n");
+            return 0;
+        }
+    }
+    return 1;
+}
 void addData()
 {
 
     Patient newPatient;
     char middlename;
 
-    printf("Enter Firstname: ");
-    scanf("%29s", newPatient.firstname);
+    do
+    {
+        printf("Enter Firstname: ");
+        scanf("%29s", newPatient.firstname);
+    } while (!validateChar(newPatient.firstname));
 
-    do {
+    do
+    {
         printf("\nDo you want to input middlename? (y/n): ");
         scanf(" %c", &middlename);
 
-        if (middlename == 'n' || middlename == 'N') {
+        if (middlename == 'n' || middlename == 'N')
+        {
             strcpy(newPatient.middlename, "");
             break;
         }
-        else if (middlename == 'y' || middlename == 'Y') {
+        else if (middlename == 'y' || middlename == 'Y')
+        {
             printf("Enter Middlename: ");
             scanf("%29s", newPatient.middlename);
             break;
@@ -76,14 +108,23 @@ void addData()
         printf("Please enter a correct alphabet (only y/n)\n");
     } while (1);
 
-    printf("Enter Lastname: ");
-    scanf("%29s", newPatient.lastname);
+    do
+    {
+        printf("Enter Lastname: ");
+        scanf("%29s", newPatient.lastname);
+    } while (!validateChar(newPatient.lastname));
 
-    printf("Enter Age: ");
-    scanf("%d", &newPatient.age);
+    do
+    {
+        printf("Enter Age: ");
+        scanf("%d", &newPatient.age);
+    } while (!validateNum(newPatient.age));
 
-    printf("Enter Health Status: ");
-    scanf(" %49[^\n]", newPatient.healthStatus);
+    do
+    {
+        printf("Enter Health Status: ");
+        scanf(" %49[^\n]", newPatient.healthStatus);
+    } while (!validateChar(newPatient.healthStatus));
 
     do
     {
@@ -96,11 +137,11 @@ void addData()
 
     if (data == NULL)
     {
-        perror("Error opening file.");
+        printf("Error opening file.");
         return;
     }
 
-    fprintf(data, "%s %s %s,%d,%s,%s\n",
+    fprintf(data, "%s,%s,%s,%d,%s,%s\n",
             newPatient.firstname,
             newPatient.middlename,
             newPatient.lastname,
@@ -160,7 +201,7 @@ void searchData()
 
     if (data == NULL)
     {
-        perror("Cannot open the file.");
+        printf("Cannot open the file.");
         return;
     }
 
@@ -214,11 +255,17 @@ void updateData()
     {
         if (strncmp(row, searchName, strlen(searchName)) == 0)
         {
-            printf("Enter new age: ");
-            scanf("%d", &updatedPatient.age);
+            do
+            {
+                printf("Enter new age: ");
+                scanf("%d", &updatedPatient.age);
+            } while (!validateNum(updatedPatient.age));
 
-            printf("Enter new health status: ");
-            scanf(" %49[^\n]", updatedPatient.healthStatus);
+            do
+            {
+                printf("Enter new health status: ");
+                scanf(" %49[^\n]", updatedPatient.healthStatus);
+            } while (!validateChar(updatedPatient.healthStatus));
 
             do
             {
@@ -227,7 +274,7 @@ void updateData()
 
             } while (!validatetheDate(updatedPatient.checkupDate));
 
-            fprintf(temp, "%s %s,%d,%s,%s\n",
+            fprintf(temp, "%s,%s,%d,%s,%s\n",
                     firstname, lastname,
                     updatedPatient.age,
                     updatedPatient.healthStatus,
@@ -377,6 +424,7 @@ int main()
             {
                 running = 0;
                 exitMenu();
+                break;
             }
             else if (continuesMenu == 'y' || continuesMenu == 'Y')
             {
