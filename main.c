@@ -19,10 +19,9 @@ typedef struct
 
 int validatetheDate(const char *date)
 {
-
     if (strlen(date) != 10)
     {
-        printf("Please input the correct format.\n");
+        printf("Please input the correct format (YYYY-MM-DD).\n");
         return 0;
     }
 
@@ -40,13 +39,36 @@ int validatetheDate(const char *date)
         }
     }
 
-    int day, month, year;
-    sscanf(date, " %4d-%2d-%2d", &year, &month, &day);
+    int year, month, day;
+    if (sscanf(date, "%4d-%2d-%2d", &year, &month, &day) != 3)
+        return 0;
+
+    if (year < 1900 || year > 2100)
+    {
+        printf("Year must be between 1900 and 2100.\n");
+        return 0;
+    }
 
     if (month < 1 || month > 12)
+    {
+        printf("Invalid month (1-12 only).\n");
         return 0;
-    if (day < 1 || day > 31)
+    }
+
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    int isLeap = 0;
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+    {
+        isLeap = 1;
+        daysInMonth[1] = 29; 
+    }
+
+    if (day < 1 || day > daysInMonth[month - 1])
+    {
+        printf("Invalid day for the given month (%d/%d).\n", day, month);
         return 0;
+    }
 
     return 1;
 }
