@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <string.h>
 
 #define csv "Checkup-Data.csv"
@@ -61,7 +62,7 @@ int validatetheDate(const char *date)
     if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
     {
         isLeap = 1;
-        daysInMonth[1] = 29; 
+        daysInMonth[1] = 29;
     }
 
     if (day < 1 || day > daysInMonth[month - 1])
@@ -87,17 +88,48 @@ int validateChar(const char *character_notnum)
     return 1;
 }
 
-int validateNum(const char *number_notchar)
+int validateNum(int number_notchar)
 {
-    for (int i = 0; number_notchar[i] != '\0'; i++)
+    for (int i = 0; number_notchar != '\0'; i++)
     {
-        if (number_notchar[i] < '0' || number_notchar[i] > '9')
+        if (number_notchar < '0' || number_notchar > '9')
         {
             printf("Please enter only numbers.\n");
             return 0;
         }
     }
     return 1;
+}
+
+int checkDuplicate(const Patient *p)
+{
+    FILE *data = fopen(csv, "r");
+    if (data == NULL)
+        return 0;
+
+    char row[1000];
+    char f[30], m[30], l[30];
+    int age;
+    char status[50], date[11];
+
+    while (fgets(row, sizeof(row), data))
+    {
+
+        sscanf(row, "%29[^,],%29[^,],%29[^,],%d,%49[^,],%10[^\n]",
+               f, m, l, &age, status, date);
+
+        if (strcasecmp(f, p->firstname) == 0 &&
+            strcasecmp(m, p->middlename) == 0 &&
+            strcasecmp(l, p->lastname) == 0 &&
+            strcmp(date, p->checkupDate) == 0)
+        {
+            fclose(data);
+            return 1;
+        }
+    }
+
+    fclose(data);
+    return 0;
 }
 
 void addData()
@@ -163,6 +195,12 @@ void addData()
         printf("Error opening file.");
         return;
     }
+
+    if (checkDuplicate(&newPatient)) {
+    printf("This record already exists. Please enter a different person/date.\n");
+    fclose(data);
+    return;
+}
 
     fprintf(data, "%s,%s,%s,%d,%s,%s\n",
             newPatient.firstname,
@@ -278,29 +316,34 @@ void updateData()
         char tmpRow[1000];
         strcpy(tmpRow, row);
 
-
         char *token = strtok(tmpRow, ",");
-        char *midToken = strtok(NULL, ","); 
+        char *midToken = strtok(NULL, ",");
         char *lastToken = strtok(NULL, ",");
 
         if (token && lastToken && strcmp(token, oldFirstname) == 0 && strcmp(lastToken, oldLastname) == 0)
         {
             found = 1;
 
-            do {
+            do
+            {
                 printf("Enter new Firstname: ");
                 scanf("%29s", updatedPatient.firstname);
             } while (!validateChar(updatedPatient.firstname));
 
-            do {
+            do
+            {
                 printf("Do you want to input Middlename? (y/n): ");
                 char choice;
                 scanf(" %c", &choice);
-                if (choice == 'n' || choice == 'N') {
+                if (choice == 'n' || choice == 'N')
+                {
                     strcpy(updatedPatient.middlename, "");
                     break;
-                } else if (choice == 'y' || choice == 'Y') {
-                    do {
+                }
+                else if (choice == 'y' || choice == 'Y')
+                {
+                    do
+                    {
                         printf("Enter Middlename: ");
                         scanf("%29s", updatedPatient.middlename);
                     } while (!validateChar(updatedPatient.middlename));
@@ -308,24 +351,28 @@ void updateData()
                 }
             } while (1);
 
-            do {
+            do
+            {
                 printf("Enter new Lastname: ");
                 scanf("%29s", updatedPatient.lastname);
             } while (!validateChar(updatedPatient.lastname));
 
             char ageStr[10];
-            do {
+            do
+            {
                 printf("Enter new Age: ");
                 scanf("%s", ageStr);
             } while (!validateNum(ageStr));
             updatedPatient.age = atoi(ageStr);
 
-            do {
+            do
+            {
                 printf("Enter new Health Status: ");
                 scanf(" %49[^\n]", updatedPatient.healthStatus);
             } while (!validateChar(updatedPatient.healthStatus));
 
-            do {
+            do
+            {
                 printf("Enter Checkup Date (YYYY-MM-DD): ");
                 scanf("%10s", updatedPatient.checkupDate);
             } while (!validatetheDate(updatedPatient.checkupDate));
@@ -385,16 +432,15 @@ void deleteData()
         char tmpRow[1000];
         strcpy(tmpRow, row);
 
-
-        char *token = strtok(tmpRow, ",");       
-        char *midToken = strtok(NULL, ",");      
-        char *lastToken = strtok(NULL, ",");    
+        char *token = strtok(tmpRow, ",");
+        char *midToken = strtok(NULL, ",");
+        char *lastToken = strtok(NULL, ",");
 
         if (token && lastToken && strcmp(token, firstname) == 0 && strcmp(lastToken, lastname) == 0)
         {
             found = 1;
             printf("Record deleted: %s %s %s\n", token, midToken ? midToken : "", lastToken);
-            continue; 
+            continue;
         }
 
         fprintf(temp, "%s", row);
