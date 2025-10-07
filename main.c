@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
 #include <string.h>
+#include <ctype.h>
 
 #define csv "Checkup-Data.csv"
 
-// ใส่วิธีcompile + run program
+// วิธี compile และ run:
+// compile: gcc -o checkup.c
+// run: ./checkup
 
 typedef struct
 {
@@ -15,7 +17,6 @@ typedef struct
     int age;
     char healthStatus[50];
     char checkupDate[11]; // format YYYY-MM-DD + \0
-
 } Patient;
 
 int validatetheDate(const char *date)
@@ -31,12 +32,18 @@ int validatetheDate(const char *date)
         if (i == 4 || i == 7)
         {
             if (date[i] != '-')
+            {
+                printf("Invalid format. Use YYYY-MM-DD.\n");
                 return 0;
+            }
         }
         else
         {
             if (date[i] < '0' || date[i] > '9')
+            {
+                printf("Invalid character in date.\n");
                 return 0;
+            }
         }
     }
 
@@ -58,10 +65,8 @@ int validatetheDate(const char *date)
 
     int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    int isLeap = 0;
     if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
     {
-        isLeap = 1;
         daysInMonth[1] = 29;
     }
 
@@ -76,10 +81,15 @@ int validatetheDate(const char *date)
 
 int validateChar(const char *character_notnum)
 {
+    if (character_notnum[0] == '\0')
+    {
+        printf("Input cannot be empty.\n");
+        return 0;
+    }
+
     for (int i = 0; character_notnum[i] != '\0'; i++)
     {
-        if (!((character_notnum[i] >= 'A' && character_notnum[i] <= 'Z') ||
-              (character_notnum[i] >= 'a' && character_notnum[i] <= 'z')))
+        if (!isalpha(character_notnum[i]) && character_notnum[i] != ' ')
         {
             printf("Please enter only letters.\n");
             return 0;
@@ -88,16 +98,30 @@ int validateChar(const char *character_notnum)
     return 1;
 }
 
-int validateNum(int number_notchar)
+int validateNum(const char *number_str)
 {
-    for (int i = 0; number_notchar != '\0'; i++)
+    if (number_str[0] == '\0')
     {
-        if (number_notchar < '0' || number_notchar > '9')
+        printf("Input cannot be empty.\n");
+        return 0;
+    }
+
+    for (int i = 0; number_str[i] != '\0'; i++)
+    {
+        if (number_str[i] < '0' || number_str[i] > '9')
         {
             printf("Please enter only numbers.\n");
             return 0;
         }
     }
+
+    int num = atoi(number_str);
+    if (num < 1 || num > 150)
+    {
+        printf("Age must be between 1 and 150.\n");
+        return 0;
+    }
+
     return 1;
 }
 
@@ -114,17 +138,17 @@ int checkDuplicate(const Patient *p)
 
     while (fgets(row, sizeof(row), data))
     {
-
-        sscanf(row, "%29[^,],%29[^,],%29[^,],%d,%49[^,],%10[^\n]",
-               f, m, l, &age, status, date);
-
-        if (strcasecmp(f, p->firstname) == 0 &&
-            strcasecmp(m, p->middlename) == 0 &&
-            strcasecmp(l, p->lastname) == 0 &&
-            strcmp(date, p->checkupDate) == 0)
+        if (sscanf(row, "%29[^,],%29[^,],%29[^,],%d,%49[^,],%10[^\n]",
+                   f, m, l, &age, status, date) >= 5)
         {
-            fclose(data);
-            return 1;
+            if (strcasecmp(f, p->firstname) == 0 &&
+                strcasecmp(m, p->middlename) == 0 &&
+                strcasecmp(l, p->lastname) == 0 &&
+                strcmp(date, p->checkupDate) == 0)
+            {
+                fclose(data);
+                return 1;
+            }
         }
     }
 
@@ -134,9 +158,11 @@ int checkDuplicate(const Patient *p)
 
 void addData()
 {
-
     Patient newPatient;
     char middlename;
+    char ageStr[10];
+
+    printf("\n--- Add New Patient ---\n");
 
     do
     {
@@ -146,7 +172,7 @@ void addData()
 
     do
     {
-        printf("\nDo you want to input middlename? (y/n): ");
+        printf("Do you want to input middlename? (y/n): ");
         scanf(" %c", &middlename);
 
         if (middlename == 'n' || middlename == 'N')
@@ -156,8 +182,11 @@ void addData()
         }
         else if (middlename == 'y' || middlename == 'Y')
         {
-            printf("Enter Middlename: ");
-            scanf("%29s", newPatient.middlename);
+            do
+            {
+                printf("Enter Middlename: ");
+                scanf("%29s", newPatient.middlename);
+            } while (!validateChar(newPatient.middlename));
             break;
         }
         printf("Please enter a correct alphabet (only y/n)\n");
@@ -172,8 +201,9 @@ void addData()
     do
     {
         printf("Enter Age: ");
-        scanf("%d", &newPatient.age);
-    } while (!validateNum(newPatient.age));
+        scanf("%9s", ageStr);
+    } while (!validateNum(ageStr));
+    newPatient.age = atoi(ageStr);
 
     do
     {
@@ -185,22 +215,20 @@ void addData()
     {
         printf("Enter Checkup Date (YYYY-MM-DD): ");
         scanf("%10s", newPatient.checkupDate);
-
     } while (!validatetheDate(newPatient.checkupDate));
 
-    FILE *data = fopen(csv, "a");
-
-    if (data == NULL)
+    if (checkDuplicate(&newPatient))
     {
-        printf("Error opening file.");
+        printf("\nThis record already exists. Please enter a different person/date.\n");
         return;
     }
 
-    if (checkDuplicate(&newPatient)) {
-    printf("This record already exists. Please enter a different person/date.\n");
-    fclose(data);
-    return;
-}
+    FILE *data = fopen(csv, "a");
+    if (data == NULL)
+    {
+        printf("Error opening file.\n");
+        return;
+    }
 
     fprintf(data, "%s,%s,%s,%d,%s,%s\n",
             newPatient.firstname,
@@ -211,11 +239,11 @@ void addData()
             newPatient.checkupDate);
 
     fclose(data);
+    printf("\nRecord added successfully!\n");
 }
 
 void displayallData()
 {
-
     char row[1000];
 
     FILE *data = fopen(csv, "r");
@@ -226,9 +254,21 @@ void displayallData()
         return;
     }
 
+    printf("\n--- All Patient Records ---\n");
+    printf("%-15s %-15s %-15s %-5s %-20s %-12s\n",
+           "Firstname", "Middlename", "Lastname", "Age", "Health Status", "Checkup Date");
+    printf("--------------------------------------------------------------------------------\n");
+
+    int count = 0;
     while (fgets(row, sizeof(row), data))
     {
         printf("%s", row);
+        count++;
+    }
+
+    if (count == 0)
+    {
+        printf("No records found.\n");
     }
 
     fclose(data);
@@ -236,24 +276,20 @@ void displayallData()
 
 void toLowerCase(char *str)
 {
-    // make string to lowercase
     for (; *str; str++)
     {
-        if (*str >= 'A' && *str <= 'Z')
-        {
-            *str = *str - 'A' + 'a';
-        }
+        *str = tolower(*str);
     }
 }
 
 void searchData()
 {
-    // search from name and health status
     char keyword[50];
     char row[1000];
     int found = 0;
 
-    printf("Search or Enter data you want : ");
+    printf("\n--- Search Records ---\n");
+    printf("Enter search keyword: ");
     scanf(" %[^\n]", keyword);
 
     toLowerCase(keyword);
@@ -262,9 +298,11 @@ void searchData()
 
     if (data == NULL)
     {
-        printf("Cannot open the file.");
+        printf("Cannot open the file.\n");
         return;
     }
+
+    printf("\n--- Search Results ---\n");
 
     while (fgets(row, sizeof(row), data))
     {
@@ -286,9 +324,9 @@ void searchData()
 
     fclose(data);
 }
+
 void updateData()
 {
-    char firstname[30], middlename[30], lastname[30];
     char row[1000];
     int found = 0;
     Patient updatedPatient;
@@ -299,17 +337,19 @@ void updateData()
     if (data == NULL || temp == NULL)
     {
         printf("Error opening files.\n");
+        if (data)
+            fclose(data);
+        if (temp)
+            fclose(temp);
         return;
     }
 
     char oldFirstname[30], oldLastname[30];
+    printf("\n--- Update Record ---\n");
     printf("Enter First Name to update: ");
     scanf("%29s", oldFirstname);
     printf("Enter Last Name to update: ");
     scanf("%29s", oldLastname);
-
-    char searchName[60];
-    sprintf(searchName, "%s,%s", oldFirstname, oldLastname);
 
     while (fgets(row, sizeof(row), data))
     {
@@ -320,9 +360,13 @@ void updateData()
         char *midToken = strtok(NULL, ",");
         char *lastToken = strtok(NULL, ",");
 
-        if (token && lastToken && strcmp(token, oldFirstname) == 0 && strcmp(lastToken, oldLastname) == 0)
+        if (token && lastToken &&
+            strcasecmp(token, oldFirstname) == 0 &&
+            strcasecmp(lastToken, oldLastname) == 0)
         {
             found = 1;
+
+            printf("\nRecord found. Enter new information:\n");
 
             do
             {
@@ -349,6 +393,10 @@ void updateData()
                     } while (!validateChar(updatedPatient.middlename));
                     break;
                 }
+                else
+                {
+                    printf("Please enter y or n only.\n");
+                }
             } while (1);
 
             do
@@ -361,7 +409,7 @@ void updateData()
             do
             {
                 printf("Enter new Age: ");
-                scanf("%s", ageStr);
+                scanf("%9s", ageStr);
             } while (!validateNum(ageStr));
             updatedPatient.age = atoi(ageStr);
 
@@ -377,13 +425,21 @@ void updateData()
                 scanf("%10s", updatedPatient.checkupDate);
             } while (!validatetheDate(updatedPatient.checkupDate));
 
-            fprintf(temp, "%s,%s,%s,%d,%s,%s\n",
-                    updatedPatient.firstname,
-                    updatedPatient.middlename,
-                    updatedPatient.lastname,
-                    updatedPatient.age,
-                    updatedPatient.healthStatus,
-                    updatedPatient.checkupDate);
+            if (checkDuplicate(&updatedPatient))
+            {
+                printf("\nThis updated record would create a duplicate. Update cancelled.\n");
+                fprintf(temp, "%s", row);
+            }
+            else
+            {
+                fprintf(temp, "%s,%s,%s,%d,%s,%s\n",
+                        updatedPatient.firstname,
+                        updatedPatient.middlename,
+                        updatedPatient.lastname,
+                        updatedPatient.age,
+                        updatedPatient.healthStatus,
+                        updatedPatient.checkupDate);
+            }
         }
         else
         {
@@ -398,12 +454,12 @@ void updateData()
     {
         remove(csv);
         rename("temp.csv", csv);
-        printf("Record updated successfully.\n");
+        printf("\nRecord updated successfully.\n");
     }
     else
     {
         remove("temp.csv");
-        printf("Record not found.\n");
+        printf("\nRecord not found.\n");
     }
 }
 
@@ -419,9 +475,14 @@ void deleteData()
     if (data == NULL || temp == NULL)
     {
         printf("Error opening files.\n");
+        if (data)
+            fclose(data);
+        if (temp)
+            fclose(temp);
         return;
     }
 
+    printf("\n--- Delete Record ---\n");
     printf("Enter First Name to delete: ");
     scanf("%29s", firstname);
     printf("Enter Last Name to delete: ");
@@ -436,7 +497,9 @@ void deleteData()
         char *midToken = strtok(NULL, ",");
         char *lastToken = strtok(NULL, ",");
 
-        if (token && lastToken && strcmp(token, firstname) == 0 && strcmp(lastToken, lastname) == 0)
+        if (token && lastToken &&
+            strcasecmp(token, firstname) == 0 &&
+            strcasecmp(lastToken, lastname) == 0)
         {
             found = 1;
             printf("Record deleted: %s %s %s\n", token, midToken ? midToken : "", lastToken);
@@ -453,11 +516,12 @@ void deleteData()
     {
         remove(csv);
         rename("temp.csv", csv);
+        printf("\nRecord deleted successfully.\n");
     }
     else
     {
         remove("temp.csv");
-        printf("Record not found.\n");
+        printf("\nRecord not found.\n");
     }
 }
 
@@ -471,7 +535,7 @@ void endtoendTest()
 
 void exitMenu()
 {
-    printf("Thank you for using the program system.\n");
+    printf("\nThank you for using the Annual Health Checkup Management System.\n");
 }
 
 int main()
