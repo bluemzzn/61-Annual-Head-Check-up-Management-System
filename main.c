@@ -5,10 +5,6 @@
 
 #define csv "Checkup-Data.csv"
 
-// วิธี compile และ run:
-// compile: gcc -o checkup.c
-// run: ./checkup
-
 typedef struct
 {
     char firstname[30];
@@ -158,17 +154,17 @@ int checkDuplicate(const Patient *p)
 
 void addData()
 {
-    Patient newPatient;
+    Patient patients;
     char middlename;
-    char ageStr[10];
+    char ageStr[4];
 
     printf("\n--- Add New Patient ---\n");
 
     do
     {
         printf("Enter Firstname: ");
-        scanf("%29s", newPatient.firstname);
-    } while (!validateChar(newPatient.firstname));
+        scanf("%29s", patients.firstname);
+    } while (!validateChar(patients.firstname));
 
     do
     {
@@ -177,7 +173,7 @@ void addData()
 
         if (middlename == 'n' || middlename == 'N')
         {
-            strcpy(newPatient.middlename, "");
+            strcpy(patients.middlename, "");
             break;
         }
         else if (middlename == 'y' || middlename == 'Y')
@@ -185,8 +181,8 @@ void addData()
             do
             {
                 printf("Enter Middlename: ");
-                scanf("%29s", newPatient.middlename);
-            } while (!validateChar(newPatient.middlename));
+                scanf("%29s", patients.middlename);
+            } while (!validateChar(patients.middlename));
             break;
         }
         printf("Please enter a correct alphabet (only y/n)\n");
@@ -195,29 +191,29 @@ void addData()
     do
     {
         printf("Enter Lastname: ");
-        scanf("%29s", newPatient.lastname);
-    } while (!validateChar(newPatient.lastname));
+        scanf("%29s", patients.lastname);
+    } while (!validateChar(patients.lastname));
 
     do
     {
         printf("Enter Age: ");
         scanf("%9s", ageStr);
     } while (!validateNum(ageStr));
-    newPatient.age = atoi(ageStr);
+    patients.age = atoi(ageStr);
 
     do
     {
         printf("Enter Health Status: ");
-        scanf(" %49[^\n]", newPatient.healthStatus);
-    } while (!validateChar(newPatient.healthStatus));
+        scanf(" %49[^\n]", patients.healthStatus);
+    } while (!validateChar(patients.healthStatus));
 
     do
     {
         printf("Enter Checkup Date (YYYY-MM-DD): ");
-        scanf("%10s", newPatient.checkupDate);
-    } while (!validatetheDate(newPatient.checkupDate));
+        scanf("%10s", patients.checkupDate);
+    } while (!validatetheDate(patients.checkupDate));
 
-    if (checkDuplicate(&newPatient))
+    if (checkDuplicate(&patients))
     {
         printf("\nThis record already exists. Please enter a different person/date.\n");
         return;
@@ -231,12 +227,12 @@ void addData()
     }
 
     fprintf(data, "%s,%s,%s,%d,%s,%s\n",
-            newPatient.firstname,
-            newPatient.middlename,
-            newPatient.lastname,
-            newPatient.age,
-            newPatient.healthStatus,
-            newPatient.checkupDate);
+            patients.firstname,
+            patients.middlename,
+            patients.lastname,
+            patients.age,
+            patients.healthStatus,
+            patients.checkupDate);
 
     fclose(data);
     printf("\nRecord added successfully!\n");
@@ -329,7 +325,7 @@ void updateData()
 {
     char row[1000];
     int found = 0;
-    Patient updatedPatient;
+    Patient patients;
 
     FILE *data = fopen(csv, "r");
     FILE *temp = fopen("temp.csv", "w");
@@ -371,8 +367,8 @@ void updateData()
             do
             {
                 printf("Enter new Firstname: ");
-                scanf("%29s", updatedPatient.firstname);
-            } while (!validateChar(updatedPatient.firstname));
+                scanf("%29s", patients.firstname);
+            } while (!validateChar(patients.firstname));
 
             do
             {
@@ -381,7 +377,7 @@ void updateData()
                 scanf(" %c", &choice);
                 if (choice == 'n' || choice == 'N')
                 {
-                    strcpy(updatedPatient.middlename, "");
+                    strcpy(patients.middlename, "");
                     break;
                 }
                 else if (choice == 'y' || choice == 'Y')
@@ -389,8 +385,8 @@ void updateData()
                     do
                     {
                         printf("Enter Middlename: ");
-                        scanf("%29s", updatedPatient.middlename);
-                    } while (!validateChar(updatedPatient.middlename));
+                        scanf("%29s", patients.middlename);
+                    } while (!validateChar(patients.middlename));
                     break;
                 }
                 else
@@ -402,30 +398,30 @@ void updateData()
             do
             {
                 printf("Enter new Lastname: ");
-                scanf("%29s", updatedPatient.lastname);
-            } while (!validateChar(updatedPatient.lastname));
+                scanf("%29s", patients.lastname);
+            } while (!validateChar(patients.lastname));
 
-            char ageStr[10];
+            char ageStr[4];
             do
             {
                 printf("Enter new Age: ");
                 scanf("%9s", ageStr);
             } while (!validateNum(ageStr));
-            updatedPatient.age = atoi(ageStr);
+            patients.age = atoi(ageStr);
 
             do
             {
                 printf("Enter new Health Status: ");
-                scanf(" %49[^\n]", updatedPatient.healthStatus);
-            } while (!validateChar(updatedPatient.healthStatus));
+                scanf(" %49[^\n]", patients.healthStatus);
+            } while (!validateChar(patients.healthStatus));
 
             do
             {
                 printf("Enter Checkup Date (YYYY-MM-DD): ");
-                scanf("%10s", updatedPatient.checkupDate);
-            } while (!validatetheDate(updatedPatient.checkupDate));
+                scanf("%10s", patients.checkupDate);
+            } while (!validatetheDate(patients.checkupDate));
 
-            if (checkDuplicate(&updatedPatient))
+            if (checkDuplicate(&patients))
             {
                 printf("\nThis updated record would create a duplicate. Update cancelled.\n");
                 fprintf(temp, "%s", row);
@@ -433,12 +429,12 @@ void updateData()
             else
             {
                 fprintf(temp, "%s,%s,%s,%d,%s,%s\n",
-                        updatedPatient.firstname,
-                        updatedPatient.middlename,
-                        updatedPatient.lastname,
-                        updatedPatient.age,
-                        updatedPatient.healthStatus,
-                        updatedPatient.checkupDate);
+                        patients.firstname,
+                        patients.middlename,
+                        patients.lastname,
+                        patients.age,
+                        patients.healthStatus,
+                        patients.checkupDate);
             }
         }
         else
