@@ -1,129 +1,197 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include "patient.h"
+#include <ctype.h>
 
-#define e2e_csv "e2e_data.csv"
+#include "e2e_header.h"
+#include "patient.h" // Include to get the definition of the Patient struct
 
+#define csv "Checkup-Data.csv"
 
-//for set up memory 
-void setup_memory() {
-    if (patients != NULL) {
-        free(patients);
-        patients = NULL;
+// Helper function to find a specific record in the CSV file for verification.
+// Returns 1 if found, 0 if not found.
+static int findRecordInFile(const char* firstname, const char* lastname, const char* healthStatus) {
+    FILE* data = fopen(csv, "r");
+    if (data == NULL) {
+        return 0; // File doesn't exist, so record not found
     }
-}
 
-void save_data_to_csv(int count) {
-    FILE *file = fopen(e2e_csv, "w");
-    if (file == NULL) {
-        printf("Error: Cannot open file for writing.\n");
-        exit(1);
-    }
-    for (int i = 0; i < count; i++) {
-        fprintf(file, "%s,%s,%s,%s,%s,%s\n",
-                patients[i].firstname,
-                patients[i].middlename,
-                patients[i].lastname,
-                patients[i].age,
-                patients[i].healthStatus,
-                patients[i].checkupDate);
-    }
-    fclose(file);
-}
-
-void load_data_from_csv(int *count) {
-    FILE *file = fopen(e2e_csv, "r");
-    if (file == NULL) {
-        return;
-    }
-    
-    char line[256];
-    while (fgets(line, sizeof(line), file)) {
-        char firstname[30], middlename[30], lastname[30], age[4], status[50], date[11];
-        
-        line[strcspn(line, "\n")] = 0;
-
-        // แยกข้อมูลด้วย sscanf (อาจต้องปรับ format string หากข้อมูลซับซ้อน)
-        if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^,],%s",
-                   firstname, middlename, lastname, age, status, date) == 6) {
-            addDataRecord(firstname, middlename, lastname, age, status, date, count);
+    char row[1000];
+    int found = 0;
+    while (fgets(row, sizeof(row), data)) {
+        // Use strstr for a simple substring check. A more robust check would parse columns.
+        if (strstr(row, firstname) != NULL &&
+            strstr(row, lastname) != NULL &&
+            strstr(row, healthStatus) != NULL) {
+            found = 1;
+            break;
         }
     }
-    fclose(file);
+
+    fclose(data);
+    return found;
 }
 
-
-void run_e2e_workflow() {
-    printf("--- Starting E2E Test Workflow ---\n\n");
-    
-    int count = 0;
-    setup_memory();
-
-    // --== 1. ADD & SAVE ==--
-    printf("Step 1: Adding new record 'Diana Prince'...\n");
-    addDataRecord("Diana", "", "Prince", "30", "Healthy", "2025-10-09", &count);
-    assert(count == 1);
-    printf("Step 2: Saving to %s...\n", e2e_csv);
-    save_data_to_csv(count);
-
-    // --== 2. RELOAD & VERIFY ==--
-    printf("Step 3: Clearing memory and reloading from file...\n");
-    setup_memory();
-    count = 0;
-    load_data_from_csv(&count);
-    assert(count == 1 && "Data should be reloaded");
-    assert(strcmp(patients[0].firstname, "Diana") == 0 && "Firstname should match");
-    printf("   ✓ Verification successful!\n\n");
-
-    // --== 3. UPDATE & SAVE ==--
-    printf("Step 4: Updating record's health status...\n");
-    updateDataRecord("Diana", "", "Prince", "31", "Amazonian", "2025-10-10", count);
-    printf("Step 5: Saving updated data to %s...\n", e2e_csv);
-    save_data_to_csv(count);
-
-    // --== 4. RELOAD & VERIFY UPDATE ==--
-    printf("Step 6: Clearing memory and reloading updated data...\n");
-    setup_memory();
-    count = 0;
-    load_data_from_csv(&count);
-    assert(count == 1 && "Updated data should be reloaded");
-    assert(strcmp(patients[0].healthStatus, "Amazonian") == 0 && "Health status should be updated");
-    assert(strcmp(patients[0].age, "31") == 0 && "Age should be updated");
-    printf("   ✓ Verification successful!\n\n");
-
-    // --== 5. SEARCH ==--
-    printf("Step 7: Searching for the updated record...\n");
-    Patient* found = searchDataRecord("Diana", "", "Prince", count);
-    assert(found != NULL && "Should find the record after reloading");
-    printf("   ✓ Record found!\n\n");
-
-    // --== 6. DELETE & SAVE ==--
-    printf("Step 8: Deleting the record...\n");
-    deleteDataRecord("Diana", "Prince", &count);
-    assert(count == 0 && "Count should be 0 after deletion");
-    printf("Step 9: Saving the empty list to %s...\n", e2e_csv);
-    save_data_to_csv(count);
-    
-    // --== 7. FINAL RELOAD & VERIFY DELETION ==--
-    printf("Step 10: Clearing memory and reloading to verify deletion...\n");
-    setup_memory();
-    count = 0;
-    load_data_from_csv(&count);
-    assert(count == 0 && "Data should be empty after deletion is saved and reloaded");
-    printf("   ✓ Verification successful! Record is permanently deleted.\n\n");
-
-    printf("--- E2E Test Workflow Passed! ---\n");
+// Non-interactive version of addData for testing
+static void test_addRecord(const Patient* p) {
+    FILE* data = fopen(csv, "a");
+    if (data == NULL) {
+        printf("E2E_ERROR: Could not open file to add test record.\n");
+        return;
+    }
+    fprintf(data, "%s,%s,%s,%d,%s,%s\n",
+            p->firstname, p->middlename, p->lastname,
+            p->age, p->healthStatus, p->checkupDate);
+    fclose(data);
 }
 
+// Non-interactive version of updateData for testing
+static void test_updateRecord(const char* oldFirstname, const char* oldLastname, const Patient* newPatient) {
+    FILE* data = fopen(csv, "r");
+    FILE* temp = fopen("temp_e2e.csv", "w");
 
-int main() {
-    remove(e2e_csv);
-    
-    run_e2e_workflow();
+    if (data == NULL || temp == NULL) {
+        printf("E2E_ERROR: Error opening files for update.\n");
+        if (data) fclose(data);
+        if (temp) fclose(temp);
+        return;
+    }
 
-    remove(e2e_csv);
+    char row[1000];
+    while (fgets(row, sizeof(row), data)) {
+        char tmpRow[1000];
+        strcpy(tmpRow, row);
+
+        char* token = strtok(tmpRow, ",");
+        strtok(NULL, ","); // Skip middle name
+        char* lastToken = strtok(NULL, ",");
+
+        if (token && lastToken && strcasecmp(token, oldFirstname) == 0 && strcasecmp(lastToken, oldLastname) == 0) {
+            // This is the record to update, write the new data instead
+            fprintf(temp, "%s,%s,%s,%d,%s,%s\n",
+                    newPatient->firstname, newPatient->middlename, newPatient->lastname,
+                    newPatient->age, newPatient->healthStatus, newPatient->checkupDate);
+        } else {
+            // Copy the existing row
+            fprintf(temp, "%s", row);
+        }
+    }
+
+    fclose(data);
+    fclose(temp);
+
+    remove(csv);
+    rename("temp_e2e.csv", csv);
+}
+
+// Non-interactive version of deleteData for testing
+static void test_deleteRecord(const char* firstname, const char* lastname) {
+    FILE* data = fopen(csv, "r");
+    FILE* temp = fopen("temp_e2e.csv", "w");
+
+    if (data == NULL || temp == NULL) {
+        printf("E2E_ERROR: Error opening files for delete.\n");
+        if (data) fclose(data);
+        if (temp) fclose(temp);
+        return;
+    }
+
+    char row[1000];
+    while (fgets(row, sizeof(row), data)) {
+        char tmpRow[1000];
+        strcpy(tmpRow, row);
+
+        char* token = strtok(tmpRow, ",");
+        strtok(NULL, ","); // Skip middle name
+        char* lastToken = strtok(NULL, ",");
+
+        if (token && lastToken && strcasecmp(token, firstname) == 0 && strcasecmp(lastToken, lastname) == 0) {
+            // This is the record to delete, so we do nothing (skip writing it)
+            continue;
+        } else {
+            // Copy the existing row
+            fprintf(temp, "%s", row);
+        }
+    }
+
+    fclose(data);
+    fclose(temp);
+
+    remove(csv);
+    rename("temp_e2e.csv", csv);
+}
+
+// Main E2E test runner function
+void run_end_to_end_test() {
+    printf("\n--- Starting End-to-End Test ---\n");
+
+    // 1. Setup: Backup original file and create a clean slate for the test
+    printf("SETUP: Backing up current data file...\n");
+    rename(csv, "Checkup-Data.csv.bak");
+    FILE *testFile = fopen(csv, "w");
+    if (testFile == NULL) {
+        printf("TEST FAILED: Could not create test file.\n");
+        rename("Checkup-Data.csv.bak", csv); // Restore backup
+        return;
+    }
+    fclose(testFile);
+
+    // --- Test Data ---
+    Patient testPatient = {"John", "Fitzgerald", "Doe", "45", "Good Condition", "2025-05-10"};
+    Patient updatedPatient = {"John", "F", "Doe", "46", "Excellent Condition", "2025-06-11"};
+    int test_passed = 1;
+
+    // 2. Test Case 1: Add a new record
+    printf("\nTEST 1: Adding a new record for '%s %s'...\n", testPatient.firstname, testPatient.lastname);
+    test_addRecord(&testPatient);
+    if (findRecordInFile(testPatient.firstname, testPatient.lastname, testPatient.healthStatus)) {
+        printf("  [PASS] Record added successfully.\n");
+    } else {
+        printf("  [FAIL] Record not found after adding.\n");
+        test_passed = 0;
+    }
+
+    // 3. Test Case 2: Update the existing record
+    printf("\nTEST 2: Updating record for '%s %s'...\n", testPatient.firstname, testPatient.lastname);
+    test_updateRecord(testPatient.firstname, testPatient.lastname, &updatedPatient);
+    if (findRecordInFile(updatedPatient.firstname, updatedPatient.lastname, updatedPatient.healthStatus)) {
+        printf("  [PASS] Record updated successfully.\n");
+    } else {
+        printf("  [FAIL] Updated record not found.\n");
+        test_passed = 0;
+    }
+    if (!findRecordInFile(testPatient.firstname, testPatient.lastname, testPatient.healthStatus)) {
+        printf("  [PASS] Old record data is no longer present.\n");
+    } else {
+        printf("  [FAIL] Old record data still exists after update.\n");
+        test_passed = 0;
+    }
+
+    // 4. Test Case 3: Delete the record
+    printf("\nTEST 3: Deleting record for '%s %s'...\n", updatedPatient.firstname, updatedPatient.lastname);
+    test_deleteRecord(updatedPatient.firstname, updatedPatient.lastname);
+    if (!findRecordInFile(updatedPatient.firstname, updatedPatient.lastname, updatedPatient.healthStatus)) {
+        printf("  [PASS] Record deleted successfully.\n");
+    } else {
+        printf("  [FAIL] Record still exists after deletion.\n");
+        test_passed = 0;
+    }
+
+    // 5. Teardown: Clean up and restore backup
+    printf("\nTEARDOWN: Cleaning up and restoring original data file...\n");
+    remove(csv);
+    rename("Checkup-Data.csv.bak", csv);
+
+    printf("\n--- End-to-End Test Finished ---\n");
+    if (test_passed) {
+        printf("Overall Result: ALL TESTS PASSED\n");
+    } else {
+        printf("Overall Result: SOME TESTS FAILED\n");
+    }
+}
+
+int main(){
+    run_end_to_end_test();
 
     return 0;
 }

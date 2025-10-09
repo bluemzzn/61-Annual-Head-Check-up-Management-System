@@ -2,18 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "e2e_header.h"
+#include "patient.h"
 
 #define csv "Checkup-Data.csv"
 
-typedef struct
-{
-    char firstname[30];
-    char middlename[30];
-    char lastname[30];
-    char age[4];
-    char healthStatus[50];
-    char checkupDate[11]; // format YYYY-MM-DD + \0
-} Patient;
+
 
 int validatetheDate(const char *date)
 {
@@ -134,8 +128,8 @@ int checkDuplicate(const Patient *p)
 
     while (fgets(row, sizeof(row), data))
     {
-        if (sscanf(row, "%29[^,],%29[^,],%29[^,],%d,%49[^,],%10[^\n]",
-                   f, m, l, &age, status, date) >= 5)
+        if (sscanf(row, "%29[^,],%29[^,],%29[^,],%3[^,],%49[^,],%10[^\n]",
+                   f, m, l, age, status, date) >= 5)
         {
             if (strcasecmp(f, p->firstname) == 0 &&
                 strcasecmp(m, p->middlename) == 0 &&
@@ -199,7 +193,7 @@ void addData()
         printf("Enter Age: ");
         scanf("%9s", ageStr);
     } while (!validateNum(ageStr));
-    patients.age = atoi(ageStr);
+    strcpy(patients.age, ageStr);
 
     do
     {
@@ -407,7 +401,7 @@ void updateData()
                 printf("Enter new Age: ");
                 scanf("%9s", ageStr);
             } while (!validateNum(ageStr));
-            patients.age = atoi(ageStr);
+            strcpy(patients.age, ageStr);
 
             do
             {
@@ -527,6 +521,7 @@ void unitTest()
 
 void endtoendTest()
 {
+    run_end_to_end_test();
 }
 
 void exitMenu()
@@ -576,12 +571,15 @@ int main()
 
         case 'h':
             exitMenu();
+            running = 0;
             break;
 
         default:
             printf("Please input a valid alphabet (a-h).\n");
             break;
         }
+
+        if (alphabet == 'h') continue;
 
         if (running)
         {
