@@ -18,7 +18,17 @@ typedef struct
 
 extern Patient* patients;
 
-int addDataRecord(const char *firstname, const char *lastname, const char *middlename,
-const char *age, const char *healthStatus, const char *checkupDate, int *count);
+int addDataRecord(const char *firstname, const char *middlename, const char *lastname, const char *age, const char *healthStatus, const char *checkupDate, int *count);
+
+Patient *searchDataRecord(const char *firstname, const char *lastname, const char *middlename, int count);
+
+int updateDataRecord(const char* firstname, const char* middlename,
+                     const char* lastname, const char* newAge,
+                     const char* newhealthStatus, const char* newcheckupDate, int count);
+
+int deleteDataRecord(const char* firstname, const char* lastname, int *count);
+
+int validatetheDate(const char *date);
+int validateNum(const char *number_str);
 
 #endif 

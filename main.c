@@ -10,7 +10,7 @@ typedef struct
     char firstname[30];
     char middlename[30];
     char lastname[30];
-    int age;
+    char age[4];
     char healthStatus[50];
     char checkupDate[11]; // format YYYY-MM-DD + \0
 } Patient;
