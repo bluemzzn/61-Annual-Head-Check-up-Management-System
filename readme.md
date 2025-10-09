@@ -11,3 +11,11 @@
 # Run unit test
 
 ` ./test `
+
+# How to run end-to-end test
+
+` gcc -o e2e_runner e2e_test.c fortest.c `
+
+# Run unit test
+
+` ./e2e_runner `
