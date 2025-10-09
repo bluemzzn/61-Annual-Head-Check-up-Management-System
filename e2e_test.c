@@ -190,7 +190,7 @@ void run_end_to_end_test() {
     }
 }
 
-int main(){
+int main_e2e(){
     run_end_to_end_test();
 
     return 0;

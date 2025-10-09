@@ -1,5 +1,5 @@
 # How to compile main program 
-` gcc -o checkup main.c `
+` gcc -o checkup main.c fortest.c unit_test.c e2e_test.c `
 
 # Run main program
 ` ./checkup `
@@ -16,6 +16,6 @@
 
 ` gcc -o e2e_runner e2e_test.c fortest.c `
 
-# Run unit test
+# Run End-to-end test
 
 ` ./e2e_runner `

@@ -156,8 +156,7 @@ void test_deleteDataRecord() {
     printf("All deleteDataRecord tests passed!\n\n");
 }
 
-
-int main() {
+void run_unit(){
     test_validateNum();
     test_addDataRecord();
     test_searchDataRecord();
@@ -168,5 +167,10 @@ int main() {
     printf("  All test suites passed successfully! \n");
     printf("=======================================\n");
 
+}
+
+
+int main_unit() {
+    run_unit();
     return 0;
 }

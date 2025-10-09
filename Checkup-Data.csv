@@ -1,10 +1,9 @@
 ﻿PatientName,Age,HealthStatus,CheckupDate
 John Doe,30,Healthy,2025-08-03
 Jane Smith,45, Requires Follow-Up,2025-08-06
-Alice Mccaulley,23,Unhealthy,2025-19-12
+Alice,Mccaulley,26,Healsdvs,2025-04-12
 Daphnie Rohas,38,Healthy,15-3-2025-09-13
 Roger Hisston,65, Requires Follow-Up,2025-09-15
-Christina Rossen,17, Requires Follow-Up,2025-19-18
 Gerard Bolt,21,Healthy,2025-10-06
 Cooper Clay,22,Unhealthy,2025-10-17
 Bronwyn Levine,28,Healthy,2025-10-18
@@ -12,7 +11,6 @@ Ashley Cromwell,34,Unhealthy,2025-10-20
 Matthew Velez,68,Healthy,2025-11-01
 Mayda Kingsley,24,Unhealthy,2025-11-03
 Kelly Clakson,39,Unhealthy,2025-11-04
-Jinjutha Okizawa,54,Healthy,2025-09-12
 Lany Mars,30,Healthy,2025-12-31
 Kanda Okuma Lugwin,45,Helathy',2025-06-15
 Riean  Loveu,45,sfa,2025-11-05
