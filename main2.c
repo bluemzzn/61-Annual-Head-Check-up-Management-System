@@ -128,10 +128,15 @@ void addData()
 
     printf("Do you want to input middlename? (y/n): ");
     scanf(" %c", &optional);
+
     if (optional == 'y' || optional == 'Y')
     {
-        printf("Enter Middlename: ");
-        scanf("%29s", middlename);
+        do
+        {
+            printf("Enter Middlename: ");
+            scanf("%29s", middlename);
+        } while (!validateChar(middlename));
+
         strcat(patientData.firstname, " ");
         strcat(patientData.firstname, middlename);
     }
@@ -199,11 +204,11 @@ void runE2eTest()
 
 void clearScreen()
 {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void exitMenu()
