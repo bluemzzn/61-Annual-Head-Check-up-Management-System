@@ -2,18 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "patient.h"
+#include "unit_test.c"
 
-#define csv "Checkup-Data.csv"
-
-typedef struct
-{
-    char firstname[60];
-    char lastname[30];
-    int age;
-    char healthStatus[50];
-    char checkupDate[11]; // YYYY-MM-DD + null terminator
-
-} Patient;
 
 int validatetheDate(const char *date)
 {
@@ -392,6 +383,7 @@ void deleteData()
     else
         printf("No matching record found.\n");
 }
+
 
 void runUnitTest()
 {
