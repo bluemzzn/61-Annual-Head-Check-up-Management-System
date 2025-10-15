@@ -15,6 +15,7 @@ typedef struct
 
 } Patient;
 
+
 int validatetheDate(const char *date)
 {
 
@@ -51,7 +52,7 @@ int validatetheDate(const char *date)
 
 int validateChar(const char *character_notnumber)
 {
-    if (character_notnumber == '\0')
+    if (character_notnumber[0] == '\0')
     {
         printf("Input cannot be empty.\n");
         return 0;
@@ -112,23 +113,21 @@ void displayallData()
     fclose(data);
 }
 
-void addData()
+Patient inputPatientData()
 {
-    Patient patientData;
     char middlename[30];
     char optional;
 
-    printf("\n--- Add New Patient ---\n");
-
+    Patient patientData;
+    
     do
     {
         printf("Enter firstname: ");
-        scanf("%29s", patientData.firstname);
+        scanf("%59s", patientData.firstname);
     } while (!validateChar(patientData.firstname));
 
     printf("Do you want to input middlename? (y/n): ");
     scanf(" %c", &optional);
-
     if (optional == 'y' || optional == 'Y')
     {
         do
@@ -164,6 +163,18 @@ void addData()
         scanf("%10s", patientData.checkupDate);
     } while (!validatetheDate(patientData.checkupDate));
 
+    return patientData;
+}
+
+void addData()
+{
+    char middlename[30];
+    char optional;
+
+    printf("\n--- Add New Patient ---\n");
+
+    Patient patientData = inputPatientData();
+
     FILE *data = fopen(csv, "a");
     if (data == NULL)
     {
@@ -182,12 +193,117 @@ void addData()
     printf("\nRecord added successfully!\n");
 }
 
+void toLowerCase(char *str)
+{
+    for (int i = 0; str[i]; i++)
+    {
+        str[i] = tolower(str[i]);
+    }
+}
+
 void searchData()
 {
+    // search from name and health status
+    char keyword[50];
+    char row[200];
+    int found = 0;
+
+    printf("Enter the name or health status: ");
+    scanf(" %[^\n]", keyword);
+    toLowerCase(keyword);
+
+    FILE *data = fopen(csv, "r");
+
+    if (data == NULL)
+    {
+        perror("Cannot open the file.");
+        return;
+    }
+
+    while (fgets(row, sizeof(row), data))
+    {
+        char rowLower[1000];
+        strcpy(rowLower, row);
+        toLowerCase(rowLower);
+       
+
+
+        if (strstr(rowLower, keyword) != NULL)
+        {
+            printf("%s", row);
+            found = 1;
+        }
+    }
+
+    if (!found)
+    {
+        printf("No matching records found.\n");
+    }
+
+    fclose(data);
 }
 
 void updateData()
 {
+    char keyword[50];
+    char row[1000];
+    int found = 0;
+
+    printf("Enter the name to update: ");
+    scanf(" %[^\n]", keyword);
+    toLowerCase(keyword);
+
+    FILE *data = fopen(csv, "r");
+    if (data == NULL)
+    {
+        printf("Cannot open the file reading.");
+        return;
+    }
+
+    FILE *temp = fopen("temp.csv", "w");
+    if (temp == NULL)
+    {
+        printf("Cannot create the temporary file.");
+        return;
+    }
+
+    while (fgets(row, sizeof(row), data))
+    {
+        char rowLower[1000];
+        strcpy(rowLower, row);
+        toLowerCase(rowLower);
+
+        if (strstr(rowLower, keyword) != NULL && !found)
+        {
+            found = 1;
+            printf("Record found: %s\n", row);
+            printf("--- Update Patient Info ---\n");
+
+            Patient patientData = inputPatientData();
+
+            fprintf(temp, "%s,%s,%d,%s,%s\n",
+                    patientData.firstname,
+                    patientData.lastname,
+                    patientData.age,
+                    patientData.healthStatus,
+                    patientData.checkupDate);
+        }
+        else
+        {
+            fputs(row, temp);
+        }
+    }
+
+    fclose(data);
+    fclose(temp);
+
+    remove(csv);
+    rename("temp.csv", csv);
+
+    if (found)
+        printf("Record updated successfully!\n");
+    else
+        printf("No matching record found.\n");
 }
 
 void deleteData()
