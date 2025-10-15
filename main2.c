@@ -204,7 +204,7 @@ void searchData()
 {
     // search from name and health status
     char keyword[50];
-    char row[200];
+    char row[1000];
     int found = 0;
 
     printf("Enter the name or health status: ");
@@ -270,7 +270,7 @@ void updateData()
         strcpy(rowLower, row);
         toLowerCase(rowLower);
 
-        if (strstr(rowLower, keyword) != NULL && !found)
+        if (strstr(rowLower, keyword) != NULL)
         {
             found = 1;
             printf("Record found: %s\n", row);
@@ -326,6 +326,9 @@ void deleteData()
             printf("Enter middlename to delete: ");
             scanf("%29s", middlename);
         } while (!validateChar(middlename));
+
+        strcat(firstname, " ");
+        strcat(firstname, middlename);
     }
 
     do
@@ -336,6 +339,7 @@ void deleteData()
 
     toLowerCase(firstname);
     toLowerCase(lastname);
+
     FILE *data = fopen(csv, "r");
 
     if (data == NULL)
@@ -352,13 +356,22 @@ void deleteData()
         return;
     }
 
+    char *token;
+    char rowFirst[60], rowLast[30];
+    char rowLower[1000];
+
     while (fgets(row, sizeof(row), data))
     {
-        char rowLower[1000];
         strcpy(rowLower, row);
         toLowerCase(rowLower);
 
-        if (strstr(rowLower, firstname) != NULL && strstr(rowLower, lastname) != NULL)
+        token = strtok(rowLower, ",");
+        strcpy(rowFirst, token);
+
+        token = strtok(NULL, ",");
+        strcpy(rowLast, token);
+
+        if (strcmp(rowFirst, firstname) == 0 && strcmp(rowLast, lastname) == 0)
         {
             found = 1;
             printf("Delete record: %s", row);
