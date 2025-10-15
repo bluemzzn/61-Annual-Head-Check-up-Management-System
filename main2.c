@@ -15,7 +15,6 @@ typedef struct
 
 } Patient;
 
-
 int validatetheDate(const char *date)
 {
 
@@ -119,7 +118,7 @@ Patient inputPatientData()
     char optional;
 
     Patient patientData;
-    
+
     do
     {
         printf("Enter firstname: ");
@@ -225,8 +224,6 @@ void searchData()
         char rowLower[1000];
         strcpy(rowLower, row);
         toLowerCase(rowLower);
-       
-
 
         if (strstr(rowLower, keyword) != NULL)
         {
@@ -308,6 +305,67 @@ void updateData()
 
 void deleteData()
 {
+    char firstname[60], middlename[30] = "", lastname[30];
+    char optional;
+    char row[1000];
+    int found = 0;
+
+    printf("Enter firstname to delete: ");
+    scanf("%59s", firstname);
+
+    printf("Do you want to input middlename? (y/n): ");
+    scanf(" %c", &optional);
+    if (optional == 'y' || optional == 'Y') {
+        printf("Enter middlename to delete: ");
+        scanf("%29s", middlename);
+    }
+
+    printf("Enter lastname to delete: ");
+    scanf("%29s", lastname);
+
+    toLowerCase(firstname);
+    toLowerCase(lastname);
+    FILE *data = fopen(csv, "r");
+
+    if (data == NULL)
+    {
+        printf("Cannot opening file.\n");
+        return;
+    }
+
+    FILE *temp = fopen("temp.csv", "w");
+
+    if (temp == NULL)
+    {
+        printf("Cannot opening the temporary file.\n");
+        return;
+    }
+
+    while (fgets(row, sizeof(row), data))
+    {   
+        char rowLower[1000];
+        strcpy(rowLower, row);
+        toLowerCase(rowLower);
+
+        if(strstr(rowLower, firstname) != NULL && strstr(rowLower, lastname) != NULL){
+            found = 1;
+            printf("Delete record: %s", row);
+            continue;
+        }
+
+        fputs(row, temp);
+    }
+    
+    fclose(data);
+    fclose(temp);
+
+    remove(csv);            
+    rename("temp.csv", csv); 
+
+    if (found)
+        printf("Record deleted successfully!\n");
+    else
+        printf("No matching record found.\n");
 }
 
 void runUnitTest()
