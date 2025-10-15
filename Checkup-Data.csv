@@ -1,7 +1,6 @@
 ﻿PatientName,Age,HealthStatus,CheckupDate
 John Doe,30,Healthy,2025-08-03
 Jane Smith,45, Requires Follow-Up,2025-08-06
-Alice,Mccaulley,26,Healsdvs,2025-04-12
 Daphnie Rohas,38,Healthy,15-3-2025-09-13
 Roger Hisston,65, Requires Follow-Up,2025-09-15
 Gerard Bolt,21,Healthy,2025-10-06
@@ -22,3 +21,4 @@ George,Strlynia,32,Unhealthy,2025-03-31
 Marko,Petunia,12,Healthy,2025-05-11
 Tas Warlock,Petunia,80,Healthy,2024-12-12
 Antony Mercedes,Bridgerton,40,Unhealthy,2025-08-08
+John,Doe,30,Healthy,2025-10-15

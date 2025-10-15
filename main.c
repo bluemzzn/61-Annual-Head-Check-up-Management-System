@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "patient.h"
-#include "unit_test.c"
 
 
 int validatetheDate(const char *date)
@@ -382,15 +381,6 @@ void deleteData()
         printf("Record deleted successfully!\n");
     else
         printf("No matching record found.\n");
-}
-
-
-void runUnitTest()
-{
-}
-
-void runE2eTest()
-{
 }
 
 void clearScreen()

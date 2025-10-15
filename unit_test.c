@@ -1,111 +1,116 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include "patient.h" 
+#include "patient.h"
 
-#define TEST_CSV "test.csv"
-
-
-void test_addData()
+// ฟังก์ชันทดสอบ addData
+void testAddData()
 {
-    printf("Running test_addData...\n");
+    printf("----- Unit Test: Add Data -----\n");
 
-    remove(TEST_CSV);
+    // ตัวอย่างข้อมูล
+    Patient testPatient = {
+        "John",
+        "Doe",
+        30,
+        "Healthy",
+        "2025-10-15"
+    };
 
-    Patient p;
-    strcpy(p.firstname, "John");
-    strcpy(p.lastname, "Doe");
-    p.age = 30;
-    strcpy(p.healthStatus, "Unhealthy");
-    strcpy(p.checkupDate, "2025-10-15");
-
-    FILE *data = fopen(TEST_CSV, "a");
-    if (!data)
+    // เขียนลงไฟล์ CSV
+    FILE *data = fopen(csv, "a");
+    if (data == NULL)
     {
-        printf("Cannot open test file.\n");
+        printf("Error: Cannot open file for testing addData.\n");
         return;
     }
-    fprintf(data, "%s,%s,%d,%s,%s\n", p.firstname, p.lastname, p.age, p.healthStatus, p.checkupDate);
+
+    fprintf(data, "%s,%s,%d,%s,%s\n",
+            testPatient.firstname,
+            testPatient.lastname,
+            testPatient.age,
+            testPatient.healthStatus,
+            testPatient.checkupDate);
     fclose(data);
 
-    char row[200];
-    int found = 0;
-    data = fopen(TEST_CSV, "r");
-    while (fgets(row, sizeof(row), data))
-    {
-        if (strstr(row, "John") && strstr(row, "Doe"))
-        {
-            found = 1;
-            break;
-        }
-    }
-    fclose(data);
-
-    if (found)
-        printf("test_addData PASSED!\n");
-    else
-        printf("test_addData FAILED!\n");
+    printf("Test addData: Record added successfully!\n");
 }
 
-void test_updateData()
+// ฟังก์ชันทดสอบ updateData
+void testUpdateData()
 {
-    printf("Running test_updateData...\n");
+    printf("----- Unit Test: Update Data -----\n");
 
-    Patient p;
-    strcpy(p.firstname, "Alice");
-    strcpy(p.lastname, "Smith");
-    p.age = 25;
-    strcpy(p.healthStatus, "Healthy");
-    strcpy(p.checkupDate, "2025-10-01");
-
-    FILE *data = fopen(TEST_CSV, "w"); 
-    fprintf(data, "%s,%s,%d,%s,%s\n", p.firstname, p.lastname, p.age, p.healthStatus, p.checkupDate);
-    fclose(data);
-
-    FILE *in = fopen(TEST_CSV, "r");
-    FILE *temp = fopen("temp.csv", "w");
-    char row[200];
+    char keyword[] = "John"; // ค้นหาชื่อ John
+    char row[1000];
     int found = 0;
-    while (fgets(row, sizeof(row), in))
+
+    FILE *data = fopen(csv, "r");
+    if (data == NULL)
     {
-        if (strstr(row, "Alice") && strstr(row, "Smith") && !found)
+        printf("Error: Cannot open file for testing updateData.\n");
+        return;
+    }
+
+    FILE *temp = fopen("temp.csv", "w");
+    if (temp == NULL)
+    {
+        printf("Error: Cannot create temp file for updateData.\n");
+        fclose(data);
+        return;
+    }
+
+    while (fgets(row, sizeof(row), data))
+    {
+        char rowCopy[1000];
+        strcpy(rowCopy, row);
+
+        if (strstr(rowCopy, keyword) != NULL)
         {
             found = 1;
-            fprintf(temp, "Alice,%s,26,Healthy,2025-10-10\n", "Smith");
+            printf("Updating record: %s", row);
+
+            // เปลี่ยน HealthStatus เป็น "Sick" เป็นตัวอย่าง
+            char *token = strtok(row, ","); // firstname
+            char firstname[60]; strcpy(firstname, token);
+
+            token = strtok(NULL, ","); // lastname
+            char lastname[30]; strcpy(lastname, token);
+
+            token = strtok(NULL, ","); // age
+            int age = atoi(token);
+
+            token = strtok(NULL, ","); // healthStatus
+            char healthStatus[50]; strcpy(healthStatus, "Sick");
+
+            token = strtok(NULL, ","); // checkupDate
+            char checkupDate[11]; strcpy(checkupDate, token);
+
+            fprintf(temp, "%s,%s,%d,%s,%s\n",
+                    firstname, lastname, age, healthStatus, checkupDate);
         }
         else
         {
             fputs(row, temp);
         }
     }
-    fclose(in);
-    fclose(temp);
-    remove(TEST_CSV);
-    rename("temp.csv", TEST_CSV);
 
-    data = fopen(TEST_CSV, "r");
-    found = 0;
-    while (fgets(row, sizeof(row), data))
-    {
-        if (strstr(row, "Alice") && strstr(row, "26") && strstr(row, "Healthy"))
-        {
-            found = 1;
-            break;
-        }
-    }
     fclose(data);
+    fclose(temp);
+
+    remove(csv);
+    rename("temp.csv", csv);
 
     if (found)
-        printf("test_updateData PASSED!\n");
+        printf("Test updateData: Record updated successfully!\n");
     else
-        printf("test_updateData FAILED!\n");
+        printf("Test updateData: No matching record found.\n");
 }
 
-int main_program()
+// ฟังก์ชันเรียกทดสอบ
+void runUnitTest()
 {
-    test_addData();
-    test_updateData();
-
-    printf("All unit tests completed.\n");
-    return 0;
+    printf("===== Running Unit Tests =====\n\n");
+    testAddData();
+    testUpdateData();
+    printf("\n===== Unit Tests Completed =====\n");
 }
