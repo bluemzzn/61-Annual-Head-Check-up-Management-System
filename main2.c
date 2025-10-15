@@ -310,18 +310,29 @@ void deleteData()
     char row[1000];
     int found = 0;
 
-    printf("Enter firstname to delete: ");
-    scanf("%59s", firstname);
+    do
+    {
+        printf("Enter firstname to delete: ");
+        scanf("%59s", firstname);
+    } while (!validateChar(firstname));
 
     printf("Do you want to input middlename? (y/n): ");
     scanf(" %c", &optional);
-    if (optional == 'y' || optional == 'Y') {
-        printf("Enter middlename to delete: ");
-        scanf("%29s", middlename);
+
+    if (optional == 'y' || optional == 'Y')
+    {
+        do
+        {
+            printf("Enter middlename to delete: ");
+            scanf("%29s", middlename);
+        } while (!validateChar(middlename));
     }
 
-    printf("Enter lastname to delete: ");
-    scanf("%29s", lastname);
+    do
+    {
+        printf("Enter lastname to delete: ");
+        scanf("%29s", lastname);
+    } while (!validateChar(lastname));
 
     toLowerCase(firstname);
     toLowerCase(lastname);
@@ -342,12 +353,13 @@ void deleteData()
     }
 
     while (fgets(row, sizeof(row), data))
-    {   
+    {
         char rowLower[1000];
         strcpy(rowLower, row);
         toLowerCase(rowLower);
 
-        if(strstr(rowLower, firstname) != NULL && strstr(rowLower, lastname) != NULL){
+        if (strstr(rowLower, firstname) != NULL && strstr(rowLower, lastname) != NULL)
+        {
             found = 1;
             printf("Delete record: %s", row);
             continue;
@@ -355,12 +367,12 @@ void deleteData()
 
         fputs(row, temp);
     }
-    
+
     fclose(data);
     fclose(temp);
 
-    remove(csv);            
-    rename("temp.csv", csv); 
+    remove(csv);
+    rename("temp.csv", csv);
 
     if (found)
         printf("Record deleted successfully!\n");
@@ -387,7 +399,7 @@ void clearScreen()
 
 void exitMenu()
 {
-    printf("Thank you for using program system.\n");
+    printf("Thank you for using my program system.\n");
 }
 
 int main()
