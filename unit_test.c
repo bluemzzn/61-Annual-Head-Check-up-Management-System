@@ -2,12 +2,10 @@
 #include <string.h>
 #include "patient.h"
 
-// ฟังก์ชันทดสอบ addData
 void testAddData()
 {
     printf("----- Unit Test: Add Data -----\n");
 
-    // ตัวอย่างข้อมูล
     Patient testPatient = {
         "John",
         "Doe",
@@ -16,7 +14,6 @@ void testAddData()
         "2025-10-15"
     };
 
-    // เขียนลงไฟล์ CSV
     FILE *data = fopen(csv, "a");
     if (data == NULL)
     {
@@ -35,12 +32,11 @@ void testAddData()
     printf("Test addData: Record added successfully!\n");
 }
 
-// ฟังก์ชันทดสอบ updateData
 void testUpdateData()
 {
     printf("----- Unit Test: Update Data -----\n");
 
-    char keyword[] = "John"; // ค้นหาชื่อ John
+    char keyword[] = "John";
     char row[1000];
     int found = 0;
 
@@ -69,7 +65,6 @@ void testUpdateData()
             found = 1;
             printf("Updating record: %s", row);
 
-            // เปลี่ยน HealthStatus เป็น "Sick" เป็นตัวอย่าง
             char *token = strtok(row, ","); // firstname
             char firstname[60]; strcpy(firstname, token);
 
@@ -106,7 +101,6 @@ void testUpdateData()
         printf("Test updateData: No matching record found.\n");
 }
 
-// ฟังก์ชันเรียกทดสอบ
 void runUnitTest()
 {
     printf("===== Running Unit Tests =====\n\n");
